@@ -439,25 +439,55 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
 
 int main()
 {
-	/* code */
-	char errBuf[PCAP_ERRBUF_SIZE], * devStr;
-	devStr = "en0";
-
-	/* open a device, wait until a packet arrives */
-	pcap_t * device = pcap_open_live(devStr, 65535, 1, 0, errBuf);
-  
-	 if(!device)
-	 {
-		 printf("error: pcap_open_live(): %s\n", errBuf);
-		 exit(1);
-	  }
-  
+    int header_type;
+    int status=0;
+	char errbuf[PCAP_ERRBUF_SIZE];
+    char *dev=(char *)"en0";
+    pcap_t *handle=0;
+    
+    handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
+    if (handle == NULL) {
+        fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
+        return 0;
+    }
+    else{
+        printf("Opened device %s\n",dev);
+    }
+    
+    if(pcap_can_set_rfmon(handle)){     //查看是否能设置为监控模式
+        printf("Device %s can be opened in monitor mode\n",dev);
+    }
+    else{
+        printf("Device %s can't be opened in monitor mode!!!\n",dev);
+    }
+    
+    pcap_set_rfmon(handle,0);   //设置为监控模式
+    if(pcap_set_rfmon(handle,1)!=0){
+        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+        return 0;
+    }
+    else{
+        printf("Device %s has been opened in monitor mode\n", dev);
+    }
+    pcap_set_promisc(handle,0);   //不设置混杂模式
+    
+    status=pcap_activate(handle);   //激活
+    if(status!=0){
+        pcap_perror(handle,(char*)"pcap error: ");
+        return 0;
+    }
+    
+    header_type=pcap_datalink(handle);  //返回链路层的类型
+    if(header_type!=DLT_IEEE802_11_RADIO){
+        printf("Error: incorrect header type - %d",header_type);
+        return 0;
+    }
 	
 
 	 /* wait loop forever */
 	 int id = 0;
-	pcap_loop(device, -1, getPacket, (u_char*)&id);
+	pcap_loop(handle, -1, getPacket, (u_char*)&id);
   
-	pcap_close(device);
+	pcap_close(handle);
 	return 0;
 }

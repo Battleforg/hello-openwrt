@@ -8,7 +8,7 @@ typedef struct
 	u_char version;
 	u_char pad;
 	u_char len[2];
-	u_char* present; // be careful! present may be more than 4*1
+	u_char present[]; // be careful! present may be more than 4*1
 
 }RADIOTAP_C_HEADER;
 
@@ -72,10 +72,8 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
 	present_count++;
 
 	// after the steps above, we get total amount of present
-
-	
-	if ((&(rHeader->present) & SIGNAL) && (signal_count > 0))
-	{
+	if ((rHeader->present[0] & SIGNAL) && (signal_count > 0))
+	{ 
 		// how many bit we should shift due to TSFT, FLAGS, RATE, CHANNEL and FHSS
 		int shift = 0;
 		int i;

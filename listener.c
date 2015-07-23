@@ -77,7 +77,8 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
 		// how many bit we should shift due to TSFT, FLAGS, RATE, CHANNEL and FHSS
 		int shift = 0;
 		int i;
-		char s;
+		u_char s;
+		int temp_signal = 0;
 		for (i = 0; i < present_count; ++i)
 		{
 			/* code */
@@ -114,7 +115,9 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
 			{
 				/* code */
 				s = currentPos[shift];
-				s += (~s + 1) * -1;
+				s = (~s) + 1;
+				temp_signal += s;
+			
 				shift += 1;
 			}
 
@@ -148,9 +151,9 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
 			shift = 0;
 		}
 		
-		s /= signal_count;
-		
-		printf("SSI signal: %d dBm\n", s);
+		temp_signal /= signal_count;
+		temp_signal *= -1;
+		printf("SSI signal: %d dBm\n", temp_signal);
 	}
 }
 

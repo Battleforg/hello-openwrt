@@ -74,7 +74,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
 	// after the steps above, we get total amount of present
 
 	
-	if ((&(rHeader->present) & SIGNAL) && (signal_count > 0))
+	if ((*(rHeader->present) & SIGNAL) && (signal_count > 0))
 	{
 		// how many bit we should shift due to TSFT, FLAGS, RATE, CHANNEL and FHSS
 		int shift = 0;
@@ -441,7 +441,7 @@ int main()
 {
 	/* code */
 	char errBuf[PCAP_ERRBUF_SIZE], * devStr;
-	devStr = "wlan0";
+	devStr = "en0";
 
 	/* open a device, wait until a packet arrives */
 	pcap_t * device = pcap_open_live(devStr, 65535, 1, 0, errBuf);

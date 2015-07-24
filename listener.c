@@ -1,10 +1,7 @@
-
-
 #include "listener.h"
 
 typedef struct 
 {
-    /* data */
     u_char version;
     u_char pad;
     u_char len[2];
@@ -14,7 +11,6 @@ typedef struct
 
 typedef struct 
 {
-    /* data */
     u_char frame_control[2];
     u_char duration[2];
     u_char address1[6]; // DA
@@ -36,7 +32,6 @@ typedef struct
 
 typedef struct encry
 {
-    /* data */
     uint8_t wpa_version;
     uint8_t group_ciphers;
     uint8_t pair_ciphers;
@@ -45,7 +40,6 @@ typedef struct encry
 
 typedef struct raw_xml_data
 {
-    /* data */  
     char mac[20];                               // source MAC address
 
     char ssid[256];                // SSID
@@ -61,6 +55,36 @@ typedef struct raw_xml_data
 }RAW_XML_DATA;
 
 struct raw_xml_data raw;
+
+//  record  MAC addresses of  known hotspot
+char knownHotspotMAC[PACKET_NUMBER][20];
+// count the number of records
+int records_count = 0;
+
+// add new hotspot record to knownHotspotMAC
+void addNewHotspot(struct raw_xml_data* raw_pointer)
+{
+    // first find out if the hotspot has already in record.
+    int i;
+    // initialize add flag is false
+    int add_flag = 0; 
+    for (i = 0; i < records_count && i < PACKET_NUMBER; ++i)
+    {
+        // if the hotspot is in record
+        if (strcmp(raw_pointer ->mac, knownHotspotMAC[i]))
+        {
+            // do nothing but return
+            return;
+        }
+    }
+    // add new hotspot record and record is not full
+    if (records_count < PACKET_NUMBER)
+    {
+        strcpy(knownHotspotMAC[records_count], raw_pointer->mac);
+    }
+    // update record count
+    records_count++;
+}
 
 void saveXML(struct raw_xml_data* raw_pointer) {
 
@@ -101,7 +125,6 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
     {
         if (currentPos[0] & SIGNAL)
         {
-            /* code */
             signal_count++;
         }
         currentPos += 4;
@@ -111,7 +134,6 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
     // last present should be added
     if (currentPos[0] & SIGNAL)
     {
-        /* code */
         signal_count++;
     }
     currentPos += 4;
@@ -127,7 +149,6 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
         int temp_signal = 0;
         for (i = 0; i < present_count; ++i)
         {
-            /* code */
             if (rHeader->present[4 * i] & TSFT)
             {
                 /*  has Time Synchronization Function timer  */
@@ -170,22 +191,22 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
 
             if (rHeader->present[4 * i] & NOISE)
             {
-                /* code */
+                /* has noise */
                 shift += 1;
             }
             if (rHeader->present[4 * i] & LOCK)
             {
-                /* code */
+                /* has lock quality */
                 shift += 2;
             }
             if (rHeader->present[4 * i + 1] & ANTENNA)
             {
-                /* code */
+                /* has antenna */
                 shift += 1;
             }
             if (rHeader->present[4 * i + 1] & RX_FLAGS)
             {
-                /* code */
+                /* has RX flags */
                 if ((16 - shift) == 1)
                 {
                     // if  RX alignment does not meet requirement(2)
@@ -193,7 +214,6 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
                 }
                 shift += 2;
             }
-
             currentPos += shift ;
             shift = 0;
         }
@@ -224,7 +244,6 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet)
     present_count++;
 
     int shift = 0;
-    /* code */
     if (rHeader->present[0] & TSFT)
     {
         /*  has Time Synchronization Function timer  */
@@ -338,7 +357,6 @@ void print_encry(ENCRYPTION * e)
     // unknown encryption type
     if (!e)
     {
-        /* code */
         printf("unknown\n");
         // output encryption type to struct RAW_XML_DATA raw
         snprintf(raw.encryption_type, sizeof(raw.encryption_type),"unknown");
@@ -474,8 +492,9 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
 
         // get time
         printf("Recieved time: %s", ctime((const time_t *)&pkthdr->ts.tv_sec)); 
+        //printf("Recieved time in microseconds : %ld\n", pkthdr->ts.tv_usec / 1000 + 1000 * pkthdr->ts.tv_sec);
         // output recieved time to struct RAW_XML_DATA raw
-        sprintf(raw.recieved_time, "%s", ctime((const time_t *)&pkthdr->ts.tv_sec));
+        sprintf(raw.recieved_time, "%ld", pkthdr->ts.tv_sec);
         // get signal
         getSignal(rHeader, packet);
         // get channel
@@ -575,17 +594,15 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
          }
         print_encry(&e);
         printf("\n\n");
+        // a pointer to raw_xml_data raw
         struct raw_xml_data* tmp = &raw;
+        // add new hotspot record
+        addNewHotspot(tmp);
         saveXML(tmp);
 
         //printf("%s\n%s\n%d\n%s\n%s%d\n", raw.mac, raw.ssid, raw.channel, raw.encryption_type, raw.recieved_time, raw.rssi);
-     }
-
-  
+     }  
 }
-
-
-
 
 int main()
 {
@@ -606,32 +623,32 @@ int main()
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
                       return 0;
     }
-        else
-        {
+    else
+    {
             printf("Opened device %s\n",dev);
     }
     
-        if(pcap_can_set_rfmon(handle))
-        {    
+    if(pcap_can_set_rfmon(handle))
+    {    
          //查看是否能设置为监控模式
         printf("Device %s can be opened in monitor mode\n",dev);
-        }
-        else
-        {
+    }
+    else
+    {
             printf("Device %s can't be opened in monitor mode!!!\n",dev);
-        }
+    }
     
     pcap_set_rfmon(handle,0);   //设置为监控模式
      
     if(pcap_set_rfmon(handle,1)!=0)
     { 
-                fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-                return 0;
-        }
-        else
-        {
-                printf("Device %s has been opened in monitor mode\n", dev);
-        }
+            fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+            return 0;
+    }
+    else
+    {
+            printf("Device %s has been opened in monitor mode\n", dev);
+    }
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
         
@@ -650,7 +667,8 @@ int main()
     }
      /* wait loop forever */
     int id = 0;
-    pcap_loop(handle, -1, getPacket, (u_char*)&id);
+    // catch 50 packet
+    pcap_loop(handle, 50, getPacket, (u_char*)&id);
   
     pcap_close(handle);
     return 0;

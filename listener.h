@@ -66,4 +66,6 @@
 
 #define BEACON_FRAME              0x80
 
+#define PACKET_NUMBER            50
+
 #endif              /* TEST_H */

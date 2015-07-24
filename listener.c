@@ -70,11 +70,12 @@ int addNewHotspot(struct raw_xml_data* raw_pointer)
     for (i = 0; i < records_count && i < PACKET_NUMBER; ++i)
     {
         // if the hotspot is in record
-        if (strcmp(raw_pointer ->mac, knownHotspotMAC[i]))
+        if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i]))
         {
             // do nothing but return 0 means old record is detected
             return 0;
         }
+        
     }
     // add new hotspot record and record is not full
     if (records_count < PACKET_NUMBER)
@@ -628,10 +629,10 @@ int main()
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    char *dev=(char *)"wlan0";
+    //char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    //char* dev=(char *)"en0";
+    char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     

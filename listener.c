@@ -67,8 +67,6 @@ int addNewHotspot(struct raw_xml_data* raw_pointer)
 {
     // first find out if the hotspot has already in record.
     int i;
-    // initialize add flag is false
-    int add_flag = 0; 
     for (i = 0; i < records_count && i < PACKET_NUMBER; ++i)
     {
         // if the hotspot is in record

@@ -1,5 +1,3 @@
-
-
 #include "listener.h"
 
 typedef struct 
@@ -61,11 +59,25 @@ typedef struct raw_xml_data
 }RAW_XML_DATA;
 
 struct raw_xml_data raw;
+int a = 0;
 
 void saveXML(struct raw_xml_data* raw_pointer) {
 
     FILE* stream;
-    stream = fopen("test.xml", "w");
+    char filename [52] = "145-510002-";
+    long seconds = time((time_t*)NULL);
+    char curtime[11];
+    sprintf(curtime,"%010ld",seconds);
+    strcat(filename,curtime);
+    char* line = "-";
+    strcat(filename,line);  
+    char str[6];
+    sprintf(str,"%05d",a);
+    a++;
+    strcat(filename,str); 
+    char* back = "-WA_SOURCE_FJ_1002-0.xml";
+    strcat(filename,back);
+    stream = fopen(filename, "w");
     fprintf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     fprintf(stream, "<MESSAGE>\n");
     fprintf(stream, "\t<DATASET name=\"WA_SOURCE_FJ_1002\" ver=\"1.0\" rmk=\"被采集热点信息\">\n");
@@ -360,21 +372,21 @@ void print_encry(ENCRYPTION * e)
             switch(e->wpa_version)
             {
                 case 3:
-                printf("mixed WPA/WPA2 "); 
+                printf("mixed WPA/WPA2"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                pos = sprintf(raw.encryption_type, "mixed WPA/WPA2 "); 
+                pos = sprintf(raw.encryption_type, "mixed WPA/WPA2"); 
                 break;
 
                 case 2:
-                printf("WPA2 ");
+                printf("WPA2");
                 // output encryption type to struct RAW_XML_DATA raw
-                pos = sprintf(raw.encryption_type, "WPA2 "); 
+                pos = sprintf(raw.encryption_type, "WPA2"); 
                 break;
 
                 case 1: 
-                printf("WPA "); 
+                printf("WPA"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                pos = sprintf(raw.encryption_type, "WPA "); 
+                pos = sprintf(raw.encryption_type, "WPA"); 
                 break;
                 default: 
                 break;
@@ -386,49 +398,49 @@ void print_encry(ENCRYPTION * e)
                 case MY_CIPHER_NONE:
                 printf("NONE\n");
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "NONE ");  
+                sprintf(raw.encryption_type + pos, "NONE");  
                 break;
 
                 case MY_CIPHER_WEP40:
                 printf(" WEP40\n"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "WEP40 "); 
+                sprintf(raw.encryption_type + pos, "WEP40"); 
                 break;
 
                 case MY_CIPHER_TKIP:
                 printf("TKIP\n");
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "TKIP "); 
+                sprintf(raw.encryption_type + pos, "TKIP"); 
                 break;
 
                 case MY_CIPHER_WRAP:
                 printf("WRAP\n"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "WRAP "); 
+                sprintf(raw.encryption_type + pos, "WRAP"); 
                 break;
 
                 case MY_CIPHER_CCMP:
                 printf("CCMP\n"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "CCMP "); 
+                sprintf(raw.encryption_type + pos, "CCMP"); 
                 break;
 
                 case MY_CIPHER_WEP104:
                 printf("WEP104\n"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "WEP104 "); 
+                sprintf(raw.encryption_type + pos, "WEP104"); 
                 break;
 
                 case MY_CIPHER_AESOCB:
                 printf("AESOCB\n"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "AESOCB "); 
+                sprintf(raw.encryption_type + pos, "AESOCB"); 
                 break;
 
-                 case MY_CIPHER_CKIP:
+                case MY_CIPHER_CKIP:
                 printf("CKIP\n"); 
                 // output encryption type to struct RAW_XML_DATA raw
-                sprintf(raw.encryption_type + pos, "CKIP "); 
+                sprintf(raw.encryption_type + pos, "CKIP"); 
                 break;
 
             }
@@ -576,7 +588,10 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
         print_encry(&e);
         printf("\n\n");
         struct raw_xml_data* tmp = &raw;
-        saveXML(tmp);
+        if(strcmp(tmp->ssid,"Broadcast") != 0) {
+            saveXML(tmp);
+        }
+        
 
         //printf("%s\n%s\n%d\n%s\n%s%d\n", raw.mac, raw.ssid, raw.channel, raw.encryption_type, raw.recieved_time, raw.rssi);
      }
@@ -594,10 +609,10 @@ int main()
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    char *dev=(char *)"wlan0";
+    //char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    //char* dev=(char *)"en0";
+    char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     
@@ -650,7 +665,7 @@ int main()
     }
      /* wait loop forever */
     int id = 0;
-    pcap_loop(handle, -1, getPacket, (u_char*)&id);
+    pcap_loop(handle, 100, getPacket, (u_char*)&id);
   
     pcap_close(handle);
     return 0;

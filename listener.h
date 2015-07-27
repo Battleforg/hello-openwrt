@@ -68,4 +68,62 @@
 
 #define PACKET_NUMBER            500
 
+
+struct radiotap_c_header
+{
+    u_char version;
+    u_char pad;
+    u_char len[2];
+    u_char present[]; // be careful! present may be more than 4*1
+
+};
+
+struct ieee80211beacon_frame
+{
+    u_char frame_control[2];
+    u_char duration[2];
+    u_char address1[6]; // DA
+    u_char address2[6]; // SA
+    u_char address3[6]; // BSS ID
+    u_char sequence[2];
+    // we not have addr4
+    // FIXED 12 BYTES parameters
+    u_char timestamp[8];
+    u_char becon_interval[2];
+    u_char capa_info[2]; // capability info
+
+    // SSID
+    u_char ssid_tag_number;
+    u_char ssid_tag_length;
+    u_char ssid[];
+
+};
+
+struct encry
+{
+    uint8_t wpa_version;
+    uint8_t group_ciphers;
+    uint8_t pair_ciphers;
+    uint8_t auth_algs;
+};
+
+struct raw_xml_data
+{
+    char mac[20];                               // source MAC address
+
+    char ssid[256];                // SSID
+    
+    int channel;                                    // channel is a int variable raning from 1 to 14
+
+    char encryption_type[100];     // encryption type
+
+    char recieved_time[100];     // recieved time
+    
+    int rssi;                                           // rssi is a negative int variable ranging form 0 to -infinity
+    
+};
+
 #endif              /* TEST_H */
+
+
+

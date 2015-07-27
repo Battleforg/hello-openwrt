@@ -1,14 +1,11 @@
 #include "listener.h"
 
 typedef struct radiotap_c_header RADIOTAP_C_HEADER;
-
 typedef struct ieee80211beacon_frame IEEE80211BEACON_FRAME;
-
 typedef struct encry ENCRYPTION;
+typedef struct raw_hotspot_xml_data RAW_HOTSPOT_XML_DATA;
 
-typedef struct raw_xml_data RAW_XML_DATA;
-
-struct raw_xml_data raw;
+struct raw_hotspot_xml_data raw;
 int a = 0;
 
 //  record  MAC addresses of  known hotspot
@@ -17,23 +14,19 @@ char knownHotspotMAC[PACKET_NUMBER][20];
 int records_count = 0;
 
 // add new hotspot record to knownHotspotMAC
-int addNewHotspot(struct raw_xml_data* raw_pointer)
+int addNewHotspot(struct raw_hotspot_xml_data* raw_pointer)
 {
     // first find out if the hotspot has already in record.
     int i;
-    for (i = 0; i < records_count && i < PACKET_NUMBER; ++i)
-    {
+    for (i = 0; i < records_count && i < PACKET_NUMBER; ++i) {
         // if the hotspot is in record
-        if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i]))
-        {
+        if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i])) {
             // do nothing but return 0 means old record is detected
             return 0;
-        }
-        
+        }   
     }
     // add new hotspot record and record is not full
-    if (records_count < PACKET_NUMBER)
-    {
+    if (records_count < PACKET_NUMBER) {
         strcpy(knownHotspotMAC[records_count], raw_pointer->mac);
     }
     // update record count
@@ -42,7 +35,8 @@ int addNewHotspot(struct raw_xml_data* raw_pointer)
     return 1;
 }
 
-void saveXML(struct raw_xml_data* raw_pointer) {
+void saveXML(struct raw_hotspot_xml_data* raw_pointer) 
+{
 
     FILE* stream;
     char filename [52] = "145-510002-";
@@ -82,17 +76,14 @@ void saveXML(struct raw_xml_data* raw_pointer) {
 }
 
 // get SIGNAL in dBm
-void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
-{
+void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet) {
     // skip constant header
     const u_char * currentPos = (u_char*)(packet + 4);
     
     int signal_count = 0;
     int present_count = 0;
-    while(currentPos[3] & EXT)
-    {
-        if (currentPos[0] & SIGNAL)
-        {
+    while(currentPos[3] & EXT) {
+        if (currentPos[0] & SIGNAL) {
             signal_count++;
         }
         currentPos += 4;
@@ -100,54 +91,45 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
     }
 
     // last present should be added
-    if (currentPos[0] & SIGNAL)
-    {
+    if (currentPos[0] & SIGNAL) {
         signal_count++;
     }
     currentPos += 4;
     present_count++;
 
     // after the steps above, we get total amount of present
-    if ((rHeader->present[0] & SIGNAL) && (signal_count > 0))
-    { 
+    if ((rHeader->present[0] & SIGNAL) && (signal_count > 0)) { 
         // how many bit we should shift due to TSFT, FLAGS, RATE, CHANNEL and FHSS
         int shift = 0;
         int i;
         u_char s;
         int temp_signal = 0;
-        for (i = 0; i < present_count; ++i)
-        {
-            if (rHeader->present[4 * i] & TSFT)
-            {
+        for (i = 0; i < present_count; ++i) {
+            if (rHeader->present[4 * i] & TSFT) {
                 /*  has Time Synchronization Function timer  */
                 shift += 8;
             }
-            if (rHeader->present[4 * i] & FLAGS)
-            {
+            if (rHeader->present[4 * i] & FLAGS) {
                 /*  has flags */
                 shift += 1;
             }
 
-            if (rHeader->present[4 * i] & RATE)
-            {
+            if (rHeader->present[4 * i] & RATE) {
                 /*  has data rate */
                 shift += 1;
             }
 
-            if (rHeader->present[4 * i] & CHANNEL)
-            {
+            if (rHeader->present[4 * i] & CHANNEL) {
                 /*  has channel information */
                 shift += 4;
             }
 
-             if (rHeader->present[4 * i] & FHSS)
-            {
+             if (rHeader->present[4 * i] & FHSS) {
                 /*  has FHSS */
                 shift += 2;
             }
 
-            if (rHeader->present[4 * i] & SIGNAL)
-            {
+            if (rHeader->present[4 * i] & SIGNAL) {
                 /* code */
                 s = currentPos[shift];
                 // do not opeartion and add 1
@@ -157,26 +139,21 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
                 shift += 1;
             }
 
-            if (rHeader->present[4 * i] & NOISE)
-            {
+            if (rHeader->present[4 * i] & NOISE) {
                 /* has noise */
                 shift += 1;
             }
-            if (rHeader->present[4 * i] & LOCK)
-            {
+            if (rHeader->present[4 * i] & LOCK) {
                 /* has lock quality */
                 shift += 2;
             }
-            if (rHeader->present[4 * i + 1] & ANTENNA)
-            {
+            if (rHeader->present[4 * i + 1] & ANTENNA) {
                 /* has antenna */
                 shift += 1;
             }
-            if (rHeader->present[4 * i + 1] & RX_FLAGS)
-            {
+            if (rHeader->present[4 * i + 1] & RX_FLAGS) {
                 /* has RX flags */
-                if ((16 - shift) == 1)
-                {
+                if ((16 - shift) == 1) {
                     // if  RX alignment does not meet requirement(2)
                     shift += 1;
                 }
@@ -188,7 +165,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet)
         
         temp_signal /= signal_count;
         temp_signal *= -1;
-        // output rssi to struct RAW_XML_DATA raw
+        // output rssi to struct RAW_HOTSPOT_XML_DATA raw
         raw.rssi = temp_signal;
         //printf("SSI signal: %d dBm\n", temp_signal);
     }
@@ -201,8 +178,7 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet)
     const u_char * currentPos  = (u_char*)(packet + 4);
     
     int present_count = 0;
-    while(currentPos[3] & EXT)
-    {
+    while(currentPos[3] & EXT) {
         currentPos += 4;
         present_count++;
     }
@@ -212,154 +188,122 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet)
     present_count++;
 
     int shift = 0;
-    if (rHeader->present[0] & TSFT)
-    {
+    if (rHeader->present[0] & TSFT) {
         /*  has Time Synchronization Function timer  */
         shift += 8;
     }
-    if (rHeader->present[0] & FLAGS)
-    {
+    if (rHeader->present[0] & FLAGS) {
         /*  has flags */
         shift += 1;
     }
 
-    if (rHeader->present[0] & RATE)
-    {
+    if (rHeader->present[0] & RATE) {
         /*  has data rate */
         shift += 1;
     }
 
-    if (rHeader->present[0] & CHANNEL)
-    {
+    if (rHeader->present[0] & CHANNEL) {
         /* calculate channel type */
         int t1 = currentPos[shift+1];
         int t2 = currentPos[shift];
 
-        // output channel 
-        //printf("channel:  ");
-
-        // output channel to struct RAW_XML_DATA raw
-        switch((t1<<8) + t2)
-        {
+        // output channel to struct RAW_HOTSPOT_XML_DATA raw
+        switch((t1<<8) + t2) {
             case CHANNEL_1:
-            //printf("1");
             raw.channel = 1;
             break;
 
             case CHANNEL_2:
-            //printf("2");
             raw.channel = 2;
             break;
 
             case CHANNEL_3:
-            //printf("3");
             raw.channel = 3;
              break;
 
             case CHANNEL_4:
-            //printf("4");
             raw.channel = 4;
             break;
 
             case CHANNEL_5:
-            //printf("5");
             raw.channel = 5;
             break;
 
             case CHANNEL_6:
-            //printf("6");
             raw.channel = 6;
             break;
 
             case CHANNEL_7:
-            //printf("7");
             raw.channel = 7;
             break;
 
             case CHANNEL_8:
-            //printf("8");
             raw.channel = 8;
             break;
 
             case CHANNEL_9:
             raw.channel = 9;
-            //printf("9");
             break;
 
             case CHANNEL_10:
             raw.channel = 10;
-            //printf("10");
             break;
 
             case CHANNEL_11:
             raw.channel = 11;
-            //printf("11");
             break;
 
             case CHANNEL_12:
             raw.channel = 12;
-            //printf("12");
             break;
 
             case CHANNEL_13:
             raw.channel = 13;
-            //printf("13");
             break;
 
             case CHANNEL_14:
             raw.channel = 14;
-            //printf("14");
             break;
 
             default:
             break;
         }
-        //printf("\n");
     }
 }
-
 
 // print encryption informaiton
 void print_encry(ENCRYPTION * e)
 {
     // unknown encryption type
-    if (!e)
-    {
+    if (!e) {
         //printf("unknown\n");
-        // output encryption type to struct RAW_XML_DATA raw
+        // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
         snprintf(raw.encryption_type, sizeof(raw.encryption_type),"unknown");
     }
     // wep, wpa, wpa2 or mixed
-    else 
-    {
+    else {
         // wep
-        if (!e->wpa_version)
-        {
+        if (!e->wpa_version) {
             //printf("WEP\n");
-            // output encryption type to struct RAW_XML_DATA raw
+            // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
             sprintf(raw.encryption_type, "WEP");
         }
         // wpa
-        else
-        {
+        else {
             int pos = 0;
-            switch(e->wpa_version)
-            {
+            switch(e->wpa_version) {
                 case 3:
-                //printf("mixed WPA/WPA2"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 pos = sprintf(raw.encryption_type, "mixed WPA/WPA2"); 
                 break;
 
                 case 2:
-                //printf("WPA2");
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 pos = sprintf(raw.encryption_type, "WPA2"); 
                 break;
 
                 case 1: 
-                //printf("WPA"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 pos = sprintf(raw.encryption_type, "WPA"); 
                 break;
                 default: 
@@ -367,58 +311,48 @@ void print_encry(ENCRYPTION * e)
             }
 
             // group ciphers
-            switch(e->group_ciphers)
-            {
+            switch(e->group_ciphers) {
                 case MY_CIPHER_NONE:
-                //printf("NONE\n");
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "NONE");  
                 break;
 
                 case MY_CIPHER_WEP40:
-                //printf(" WEP40\n"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "WEP40"); 
                 break;
 
                 case MY_CIPHER_TKIP:
-                //printf("TKIP\n");
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "TKIP"); 
                 break;
 
                 case MY_CIPHER_WRAP:
-                //printf("WRAP\n"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "WRAP"); 
                 break;
 
                 case MY_CIPHER_CCMP:
-                //printf("CCMP\n"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "CCMP"); 
                 break;
 
                 case MY_CIPHER_WEP104:
-                //printf("WEP104\n"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "WEP104"); 
                 break;
 
                 case MY_CIPHER_AESOCB:
-                //printf("AESOCB\n"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "AESOCB"); 
                 break;
 
                 case MY_CIPHER_CKIP:
-                //printf("CKIP\n"); 
-                // output encryption type to struct RAW_XML_DATA raw
+                // output encryption type to struct RAW_HOTSPOT_XML_DATA raw
                 sprintf(raw.encryption_type + pos, "CKIP"); 
                 break;
 
             }
-
         }
     }
 }
@@ -426,7 +360,6 @@ void print_encry(ENCRYPTION * e)
 
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet)
 {
-    //int * id  = (int *)arg;
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
     // calculate radiotap header length
     int l1= rHeader->len[1];
@@ -435,8 +368,6 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     
     // packet len which have not been visited yet
     int len_count = pkthdr->len;
-    // printf("Packet length: %d\n", pkthdr->len);
-    // printf("Number of bytes: %d\n", pkthdr->caplen);
     
     // skip to 802.11frame header
     const IEEE80211BEACON_FRAME * bHeader = (IEEE80211BEACON_FRAME*)(packet + radiotap_len);
@@ -447,13 +378,9 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     // if this frame is a 802.11 beacon frame
     if ((bHeader->frame_control[0]) == BEACON_FRAME &&
         bHeader->frame_control[1] == 0x00) {
-        //printf("----------------------------------------\n");
-        //printf("id: %d\n", ++(*id));
 
         // get time
-        //printf("Recieved time: %s", ctime((const time_t *)&pkthdr->ts.tv_sec)); 
-        //printf("Recieved time in microseconds : %ld\n", pkthdr->ts.tv_usec / 1000 + 1000 * pkthdr->ts.tv_sec);
-        // output recieved time to struct RAW_XML_DATA raw
+        // output recieved time to struct RAW_HOTSPOT_XML_DATA raw
         sprintf(raw.recieved_time, "%ld", pkthdr->ts.tv_sec);
         // get signal
         getSignal(rHeader, packet);
@@ -462,30 +389,20 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
         // update len_count;
         len_count -= radiotap_len;
         // SOURCE MAC
-        //printf("source MAC : %02X-%02X-%02X-%02X-%02X-%02X\n", bHeader->address2[0], bHeader->address2[1], 
-           //bHeader->address2[2], bHeader->address2[3], bHeader->address2[4], bHeader->address2[5]);
-        // output source mac to struct RAW_XML_DATA raw
+        // output source mac to struct RAW_HOTSPOT_XML_DATA raw
         sprintf(raw.mac, "%02X-%02X-%02X-%02X-%02X-%02X", bHeader->address2[0], bHeader->address2[1], 
            bHeader->address2[2], bHeader->address2[3], bHeader->address2[4], bHeader->address2[5]);
         // SSID
-        //printf("SSID : ");
-        if (bHeader -> ssid_tag_length)
-        {
-            /* code */
+        if (bHeader -> ssid_tag_length) {
             // get SSID 
-            for (i = 0; i < bHeader->ssid_tag_length; ++i)
-            {
-                /* code */
+            for (i = 0; i < bHeader->ssid_tag_length; ++i) {
                 //printf("%c", bHeader->ssid[i]);
                 sprintf(raw.ssid + i, "%c", bHeader->ssid[i]);
             }
         }
-        else
-        {
-            //printf("Broadcast\n");
+        else {
             sprintf(raw.ssid, "Broadcast");
         }
-            //printf("\n");
       
         ENCRYPTION e;
         e.wpa_version = 0;
@@ -499,8 +416,7 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
         const u_char * p_encryption = &(bHeader->ssid[bHeader->ssid_tag_length]);
         len_count -= (38 + bHeader->ssid_tag_length);
 
-        while (len_count > 0)
-        {
+        while (len_count > 0) {
             // get tag number;
             int tag_num = *p_encryption;
             // move to tag length and get it
@@ -508,24 +424,16 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
             len_count -= 1;
             int tag_len = *p_encryption;
             // if tag number is RSN
-            if (tag_num == RSN)
-            {
-                if (!memcmp(p_encryption + 3, wpa_oui, 3))
-                {
-                    /* code */
+            if (tag_num == RSN) {
+                if (!memcmp(p_encryption + 3, wpa_oui, 3)) {
                     e.wpa_version +=1;
                  }
-                else if (!memcmp(p_encryption + 3, wpa2_oui, 3))
-                {
-                     /* code */
+                else if (!memcmp(p_encryption + 3, wpa2_oui, 3)) {
                      e.wpa_version +=2;
                 }
 
-                  if (!memcmp(p_encryption + 3, wpa_oui, 3) || !memcmp(p_encryption + 3, wpa2_oui, 3))
-                 {
-                    /* code */
-                    switch(p_encryption[6])
-                    {
+                if (!memcmp(p_encryption + 3, wpa_oui, 3) || !memcmp(p_encryption + 3, wpa2_oui, 3)) {
+                    switch(p_encryption[6]) {
                         case 1: e.group_ciphers |= MY_CIPHER_WEP40; break;
                         case 2: e.group_ciphers |= MY_CIPHER_TKIP; break;
                         case 4: e.group_ciphers |= MY_CIPHER_CCMP; break;
@@ -538,21 +446,18 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
             }
 
             // if tag is VERDOR_SPECIFIC
-            else if (tag_num == VERDOR_SPECIFIC)
-            {
-                 if (!memcmp(p_encryption + 1, wpa_oui, 3) && p_encryption[4] == 1)
-                {
+            else if (tag_num == VERDOR_SPECIFIC) {
+                 if (!memcmp(p_encryption + 1, wpa_oui, 3) && p_encryption[4] == 1) {
                     e.wpa_version +=1;
                 }
             }
-
             p_encryption += (tag_len + 1);
             len_count -= (tag_len + 1);
          }
         print_encry(&e);
         //printf("\n");
-        // a pointer to raw_xml_data raw
-        struct raw_xml_data* tmp = &raw;
+        // a pointer to RAW_HOTSPOT_XML_DATA raw
+        struct raw_hotspot_xml_data* tmp = &raw;
 
         // if hotspot ssid is not null(Broadcast) and is a new record
         if(strcmp(tmp->ssid,"Broadcast") != 0 && addNewHotspot(tmp)) {
@@ -562,7 +467,7 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
         }
         
 
-        
+        // if not a beacon frame
     } else {
         //printf("----------------------------------------\n");
         //printf("id: %d\n", ++(*id));
@@ -580,63 +485,55 @@ int main()
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    //char *dev=(char *)"wlan0";
+    char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    char* dev=(char *)"en0";
+    //char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     
-    if (handle == NULL) 
-    {
+    if (handle == NULL)  {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-                      return 0;
+        return 0;
     }
-    else
-    {
-            printf("Opened device %s\n",dev);
+    else {
+        printf("Opened device %s\n",dev);
     }
     
-    if(pcap_can_set_rfmon(handle))
-    {    
+    if(pcap_can_set_rfmon(handle)) {    
          //查看是否能设置为监控模式
         //printf("Device %s can be opened in monitor mode\n",dev);
     }
-    else
-    {
+    else {
             //printf("Device %s can't be opened in monitor mode!!!\n",dev);
     }
     
     pcap_set_rfmon(handle,0);   //设置为监控模式
      
-    if(pcap_set_rfmon(handle,1)!=0)
-    { 
-            fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-            return 0;
+    if(pcap_set_rfmon(handle,1)!=0) { 
+        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+        return 0;
     }
-    else
-    {
-            printf("Device %s has been opened in monitor mode\n", dev);
+    else {
+        printf("Device %s has been opened in monitor mode\n", dev);
     }
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
         
     status=pcap_activate(handle);   //激活
-    if(status!=0)
-    {
+    if(status!=0) {
         pcap_perror(handle,(char*)"pcap error: ");
         return 0;
     }
         
     header_type=pcap_datalink(handle);  //返回链路层的类型
-    if(header_type!=DLT_IEEE802_11_RADIO)
-    {
+    if(header_type!=DLT_IEEE802_11_RADIO) {
             //printf("Error: incorrect header type - %d",header_type);
             return 0;            
     }
-     /* wait loop forever */
+     
     int id = 0;
-
+    /* wait loop until PACKET_NUMBER */
     pcap_loop(handle, PACKET_NUMBER, getPacket, (u_char*)&id);
   
     pcap_close(handle);

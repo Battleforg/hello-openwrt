@@ -107,19 +107,19 @@ struct encry
     uint8_t auth_algs;
 };
 
-struct raw_xml_data
+struct raw_hotspot_xml_data
 {
-    char mac[20];                               // source MAC address
+    char mac[20];                          // source MAC address
 
-    char ssid[256];                // SSID
+    char ssid[256];                        // SSID
     
-    int channel;                                    // channel is a int variable raning from 1 to 14
+    int channel;                             // channel is a int variable raning from 1 to 14
 
-    char encryption_type[100];     // encryption type
+    char encryption_type[100];  // encryption type
 
     char recieved_time[100];     // recieved time
     
-    int rssi;                                           // rssi is a negative int variable ranging form 0 to -infinity
+    int rssi;                                    // rssi is a negative int variable ranging form 0 to -infinity
     
 };
 

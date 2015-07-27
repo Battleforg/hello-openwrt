@@ -123,6 +123,18 @@ struct raw_hotspot_xml_data
     
 };
 
+typedef struct radiotap_c_header RADIOTAP_C_HEADER;
+typedef struct ieee80211beacon_frame IEEE80211BEACON_FRAME;
+typedef struct encry ENCRYPTION;
+typedef struct raw_hotspot_xml_data RAW_HOTSPOT_XML_DATA;
+
+// get SIGNAL in dBm
+void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
+// get channel
+void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
+// print encryption informaiton
+void print_encry(ENCRYPTION * e, struct raw_hotspot_xml_data* raw_pointer);
+
 #endif              /* TEST_H */
 
 

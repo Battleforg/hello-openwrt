@@ -11,4 +11,4 @@ parser.o : parser.c listener.h
 saveXML.o : saveXML.c saveXML.h
 	$(CC) $(CFLAGS) -c saveXML.c -o saveXML.o
 clean:
-	rm -rf *.o *.xml rssi 
+	rm -rf *.o listener *.xml 

@@ -110,17 +110,11 @@ struct encry
 struct raw_hotspot_xml_data
 {
     char mac[20];                          // source MAC address
-
     char ssid[256];                        // SSID
-    
     int channel;                             // channel is a int variable raning from 1 to 14
-
     char encryption_type[100];  // encryption type
-
     char recieved_time[100];     // recieved time
-    
-    int rssi;                                    // rssi is a negative int variable ranging form 0 to -infinity
-    
+    int rssi;                                    // rssi is a negative int variable ranging form 0 to -infinity 
 };
 
 struct ieee80211_common_header
@@ -130,12 +124,20 @@ struct ieee80211_common_header
     u_char address1[6]; 
 };
 
+struct raw_sta_xml_data {
+	// should have more varibles
+	char mac[20];
+	int rssi;
+	char recieved_time[100];
+};
+
+
 typedef struct radiotap_c_header RADIOTAP_C_HEADER;
 typedef struct ieee80211beacon_frame IEEE80211BEACON_FRAME;
 typedef struct encry ENCRYPTION;
 typedef struct raw_hotspot_xml_data RAW_HOTSPOT_XML_DATA;
 typedef struct ieee80211_common_header IEEE80211_COMMON_HEADER;
-
+typedef struct raw_sta_xml_data RAW_STA_XML_DATA;
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
 // get channel

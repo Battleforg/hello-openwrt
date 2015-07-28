@@ -1,6 +1,5 @@
 #include "listener.h"
 
-
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer)
 {
@@ -270,8 +269,3 @@ void print_encry(ENCRYPTION * e, struct raw_hotspot_xml_data* raw_pointer)
     }
 }
 
-// get station mac address from different kinds of packet
-void getStationMAC(IEEE80211_COMMON_HEADER * cHeader)
-{
-    
-}

@@ -89,7 +89,7 @@ struct ieee80211beacon_frame
     // we not have addr4
     // FIXED 12 BYTES parameters
     u_char timestamp[8];
-    u_char becon_interval[2];
+    u_char beacon_interval[2];
     u_char capa_info[2]; // capability info
 
     // SSID
@@ -123,10 +123,18 @@ struct raw_hotspot_xml_data
     
 };
 
+struct ieee80211_common_header
+{
+    u_char frame_control[2];
+    u_char duration[2];
+    u_char address1[6]; 
+};
+
 typedef struct radiotap_c_header RADIOTAP_C_HEADER;
 typedef struct ieee80211beacon_frame IEEE80211BEACON_FRAME;
 typedef struct encry ENCRYPTION;
 typedef struct raw_hotspot_xml_data RAW_HOTSPOT_XML_DATA;
+typedef struct ieee80211_common_header IEEE80211_COMMON_HEADER;
 
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
@@ -134,6 +142,8 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
 void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
 // print encryption informaiton
 void print_encry(ENCRYPTION * e, struct raw_hotspot_xml_data* raw_pointer);
+// get station mac address from different kinds of packet
+void getStationMAC(IEEE80211_COMMON_HEADER * cHeader);
 
 #endif              /* TEST_H */
 

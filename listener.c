@@ -1,6 +1,5 @@
 #include "listener.h"
 
-
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer)
 {

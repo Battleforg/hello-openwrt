@@ -1,8 +1,6 @@
 #include "listener.h"
 
-
 struct raw_hotspot_xml_data raw;
-int a = 0;
 
 //  record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
@@ -30,50 +28,6 @@ int addNewHotspot(struct raw_hotspot_xml_data* raw_pointer)
     // new record has been added and return 1
     return 1;
 }
-
-void saveXML(struct raw_hotspot_xml_data* raw_pointer) 
-{
-
-    FILE* stream;
-    char filename [52] = "145-510002-";
-    long seconds = time((time_t*)NULL);
-    char curtime[11];
-    sprintf(curtime,"%010ld",seconds);
-    strcat(filename,curtime);
-    char* line = "-";
-    strcat(filename,line);  
-    char str[6];
-    sprintf(str,"%05d",a);
-    a++;
-    strcat(filename,str); 
-    char* back = "-WA_SOURCE_FJ_1002-0.xml";
-    strcat(filename,back);
-    stream = fopen(filename, "w");
-    fprintf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    fprintf(stream, "<MESSAGE>\n");
-    fprintf(stream, "\t<DATASET name=\"WA_SOURCE_FJ_1002\" ver=\"1.0\" rmk=\"被采集热点信息\">\n");
-    fprintf(stream, "\t\t<DATA>\n");
-    fprintf(stream, "\t\t\t<ITEM key=\"F030011\" val=\"%s\" chn=\"热点MAC地址\" eng=\"AP_MAC\" fmt=\"c\" datatype=\"VARCHAR\" length=\"17\" nullable=\"NO\"/>\n",raw_pointer->mac);
-    fprintf(stream, "\t\t\t<ITEM key=\"F030001\" val=\"%s\" chn=\"热点SSID\" eng=\"AP_SSID\" fmt=\"c\" datatype=\"VARCHAR\" length=\"64\" nullable=\"YES\"/>\n",raw_pointer->ssid);
-    fprintf(stream, "\t\t\t<ITEM key=\"F030022\" val=\"%d\" chn=\"热点频道\" eng=\"AP_CHANNEL\" fmt=\"c\" datatype=\"VARCHAR\" length=\"2\" nullable=\"NO\"/>\n",raw_pointer->channel);
-    fprintf(stream, "\t\t\t<ITEM key=\"B040025\" val=\"%s\" chn=\"热点加密类型\" eng=\"ENCRYPT_ALGORITHM_TYPE\" fmt=\"c\" datatype=\"VARCHAR\" length=\"2\" nullable=\"NO\"/>\n",raw_pointer->encryption_type);
-    fprintf(stream, "\t\t\t<ITEM key=\"H010014\" val=\"%s\" chn=\"采集时间\" eng=\"CAPTURE_TIME\" fmt=\"n\" datatype=\"INT\" length=\"20\" nullable=\"NO\"/>\n",raw_pointer->recieved_time);
-    fprintf(stream, "\t\t\t<ITEM key=\"F030023\" val=\"%d\" chn=\"热点场强\" eng=\"AP_FIELD STRENGTH\" fmt=\"c\" datatype=\"VARCHAR\" length=\"8\" nullable=\"NO\"/>\n",raw_pointer->rssi);
-    //fprintf(stream, "\t\t\t<ITEM key=\"I070001\" val=\"%s\" chn=\"X坐标\" eng=\"X_COORDINATE\" fmt=\"c\" datatype=\"VARCHAR\" length=\"8\" nullable=\"YES\"/>\n",s);
-    //fprintf(stream, "\t\t\t<ITEM key=\"I070002\" val=\"%s\" chn=\"Y坐标\" eng=\"Y_COORDINATE\" fmt=\"c\" datatype=\"VARCHAR\" length=\"8\" nullable=\"YES\"/>\n",s);
-    //fprintf(stream, "\t\t\t<ITEM key=\"G020004\" val=\"%s\" chn=\"场所编号\" eng=\"NETBAR_WACODE\" fmt=\"c\" datatype=\"VARCHAR\" length=\"14\" nullable=\"NO\"/>\n",s);
-    //fprintf(stream, "\t\t\t<ITEM key=\"I070011\" val=\"%s\" chn=\"采集设备编号\" eng=\"COLLECTION_EQUIPMENT ID\" fmt=\"c\" datatype=\"VARCHAR\" length=\"21\" nullable=\"NO\"/>\n",s);
-    //fprintf(stream, "\t\t\t<ITEM key=\"F010018\" val=\"%s\" chn=\"采集设备经度\" eng=\"COLLECTION_EQUIPMENT_LONGITUDE\" fmt=\"c\" datatype=\"VARCHAR\" length=\"10\" nullable=\"NO\"/>\n",s);
-    //fprintf(stream, "\t\t\t<ITEM key=\"F010019\" val=\"%s\" chn=\"采集设备纬度\" eng=\"COLLECTION_EQUIPMENT_LATITUDE\" fmt=\"c\" datatype=\"VARCHAR\" length=\"10\" nullable=\"NO\"/>\n",s);
-    fprintf(stream, "\t\t</DATA>\n");
-    fprintf(stream, "\t</DATASET>\n");
-    fprintf(stream, "</MESSAGE>\n");
-    fclose(stream);
-}
-
-
-
-
 
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet)
 {
@@ -178,11 +132,8 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
 
         // if hotspot ssid is not null(Broadcast) and is a new record
         if(strcmp(tmp->ssid,"Broadcast") != 0 && addNewHotspot(tmp)) {
-            saveXML(tmp);
-            printf("------------------%d----------------------\n", records_count);
-            printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", raw.ssid, raw.mac, raw.rssi, raw.channel, raw.recieved_time, raw.encryption_type);
+            save_hotspot(tmp);
         }
-        
 
         // if not a beacon frame
     } else {

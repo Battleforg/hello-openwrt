@@ -8,8 +8,8 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
     
     int signal_count = 0;
     int present_count = 0;
-    while(currentPos[3] & EXT) {
-        if (currentPos[0] & SIGNAL) {
+    while(currentPos[3] &IEEE80211_RADIOTAP_EXT) {
+        if (currentPos[0] & IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
             signal_count++;
         }
         currentPos += 4;
@@ -17,45 +17,45 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
     }
 
     // last present should be added
-    if (currentPos[0] & SIGNAL) {
+    if (currentPos[0] & IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
         signal_count++;
     }
     currentPos += 4;
     present_count++;
 
     // after the steps above, we get total amount of present
-    if ((rHeader->present[0] & SIGNAL) && (signal_count > 0)) { 
+    if ((rHeader->present[0] & IEEE80211_RADIOTAP_DBM_ANTSIGNAL) && (signal_count > 0)) { 
         // how many bit we should shift due to TSFT, FLAGS, RATE, CHANNEL and FHSS
         int shift = 0;
         int i;
         u_char s;
         int temp_signal = 0;
         for (i = 0; i < present_count; ++i) {
-            if (rHeader->present[4 * i] & TSFT) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_TSFT) {
                 /*  has Time Synchronization Function timer  */
                 shift += 8;
             }
-            if (rHeader->present[4 * i] & FLAGS) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_FLAGS) {
                 /*  has flags */
                 shift += 1;
             }
 
-            if (rHeader->present[4 * i] & RATE) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_RATE) {
                 /*  has data rate */
                 shift += 1;
             }
 
-            if (rHeader->present[4 * i] & CHANNEL) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_CHANNEL) {
                 /*  has channel information */
                 shift += 4;
             }
 
-             if (rHeader->present[4 * i] & FHSS) {
+             if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_FHSS) {
                 /*  has FHSS */
                 shift += 2;
             }
 
-            if (rHeader->present[4 * i] & SIGNAL) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
                 /* code */
                 s = currentPos[shift];
                 // do not opeartion and add 1
@@ -65,25 +65,29 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
                 shift += 1;
             }
 
-            if (rHeader->present[4 * i] & NOISE) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_DBM_ANTNOISE) {
                 /* has noise */
                 shift += 1;
             }
-            if (rHeader->present[4 * i] & LOCK) {
+            if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_LOCK_QUALITY) {
                 /* has lock quality */
                 shift += 2;
             }
-            if (rHeader->present[4 * i + 1] & ANTENNA) {
+            if (rHeader->present[4 * i + 1] & IEEE80211_RADIOTAP_ANTENNA) {
                 /* has antenna */
                 shift += 1;
             }
-            if (rHeader->present[4 * i + 1] & RX_FLAGS) {
+            if (rHeader->present[4 * i + 1] & IEEE80211_RADIOTAP_RX_FLAGS) {
                 /* has RX flags */
                 if ((16 - shift) == 1) {
                     // if  RX alignment does not meet requirement(2)
                     shift += 1;
                 }
                 shift += 2;
+            }
+            if (rHeader->present[4*i + 2] & HT_INFO)
+            {
+                shift += 3;
             }
             currentPos += shift ;
             shift = 0;
@@ -103,7 +107,7 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct r
     const u_char * currentPos  = (u_char*)(packet + 4);
     
     int present_count = 0;
-    while(currentPos[3] & EXT) {
+    while(currentPos[3] & IEEE80211_RADIOTAP_EXT) {
         currentPos += 4;
         present_count++;
     }
@@ -113,21 +117,21 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct r
     present_count++;
 
     int shift = 0;
-    if (rHeader->present[0] & TSFT) {
+    if (rHeader->present[0] & IEEE80211_RADIOTAP_TSFT) {
         /*  has Time Synchronization Function timer  */
         shift += 8;
     }
-    if (rHeader->present[0] & FLAGS) {
+    if (rHeader->present[0] & IEEE80211_RADIOTAP_FLAGS) {
         /*  has flags */
         shift += 1;
     }
 
-    if (rHeader->present[0] & RATE) {
+    if (rHeader->present[0] & IEEE80211_RADIOTAP_RATE) {
         /*  has data rate */
         shift += 1;
     }
 
-    if (rHeader->present[0] & CHANNEL) {
+    if (rHeader->present[0] & IEEE80211_RADIOTAP_CHANNEL) {
         /* calculate channel type */
         int t1 = currentPos[shift+1];
         int t2 = currentPos[shift];

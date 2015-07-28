@@ -1,3 +1,45 @@
+/* $FreeBSD: src/sys/net80211/ieee80211_radiotap.h,v 1.5 2005/01/22 20:12:05 sam Exp $ */
+/* $NetBSD: ieee80211_radiotap.h,v 1.11 2005/06/22 06:16:02 dyoung Exp $ */
+
+/*-
+ * Copyright (c) 2003, 2004 David Young.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of David Young may not be used to endorse or promote
+ *    products derived from this software without specific prior
+ *    written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY DAVID YOUNG ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL DAVID
+ * YOUNG BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
+ */
+
+/*
+ * Modifications to fit into the linux IEEE 802.11 stack,
+ * Mike Kershaw (dragorn@kismetwireless.net)
+ */
+
+ /*
+  * Modifications to meet project request
+  * Li Yicong(lycgaming@163.com)
+  */
+
 #ifndef LISTENER_H
 #define LISTENER_H
 
@@ -9,20 +51,33 @@
 #include <string.h>
 
 
-// flags 
-#define TSFT 0x01    // Time Synchronization Function timer
-#define FLAGS 0x02
-#define RATE 0x04
-#define CHANNEL 0x08
-#define FHSS 0x10
-#define SIGNAL 0x20
-#define NOISE 0x40
-#define LOCK  0x80
+// present flags present[0]
+#define IEEE80211_RADIOTAP_TSFT 0x01    // Time Synchronization Function timer
+#define IEEE80211_RADIOTAP_FLAGS 0x02
+#define IEEE80211_RADIOTAP_RATE 0x04
+#define IEEE80211_RADIOTAP_CHANNEL 0x08
+#define IEEE80211_RADIOTAP_FHSS 0x10
+#define IEEE80211_RADIOTAP_DBM_ANTSIGNAL 0x20
+#define IEEE80211_RADIOTAP_DBM_ANTNOISE 0x40
+#define IEEE80211_RADIOTAP_LOCK_QUALITY  0x80
 
-#define ANTENNA 0x08
-#define RX_FLAGS 0x40
+// present[1]
+#define IEEE80211_RADIOTAP_TX_ATTENUATION 0x01
+#define IEEE80211_RADIOTAP_DB_TX_ATTENUATION 0x02
+#define IEEE80211_RADIOTAP_DBM_TX_POWER 0x04
+#define IEEE80211_RADIOTAP_ANTENNA 0x08
+#define IEEE80211_RADIOTAP_DB_ANTSIGNAL 0x10
+#define IEEE80211_RADIOTAP_DB_ANTNOISE 0x20
+#define IEEE80211_RADIOTAP_RX_FLAGS 0x40
+#define IEEE80211_RADIOTAP_TX_FLAGS 0x80
 
-#define EXT 0x80
+// present[2]
+#define HT_INFO 0x08                                                        // MCS infomation 3bytes  
+
+// presnent[3]
+#define IEEE80211_RADIOTAP_EXT 0x80
+
+
 
 #define CHANNEL_1 2412
 #define CHANNEL_2 2417

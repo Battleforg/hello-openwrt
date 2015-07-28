@@ -1,4 +1,5 @@
 #include "listener.h"
+#include "saveXML.h"
 
 struct raw_hotspot_xml_data raw;
 

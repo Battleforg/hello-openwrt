@@ -277,30 +277,61 @@ void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer)
     }
 }
 
+
+// record MAC addresses of know station
+char knownStaMAC[PACKET_NUMBER][20];
+// count the number of records
+int sta_records_count = 0;
+
+// add new station record to knownStaMAC
+int addNewStation(RAW_STA_XML_DATA* raw_pointer)
+{
+    // first find out if the staion has already in record.
+    int i;
+    for (i = 0; i < sta_records_count && i < PACKET_NUMBER; ++i) {
+        // if the hotspot is in record
+        if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
+            // do nothing but return 0 means old record is detected
+            return 0;
+        }   
+    }
+    // add new hotspot record and record is not full
+    if (sta_records_count < PACKET_NUMBER) {
+        strcpy(knownStaMAC[sta_records_count], raw_pointer->mac);
+    }
+    // update record count
+    sta_records_count++;
+    // new record has been added and return 1
+    return 1;
+}
+
 // get station mac address from different kinds of packet
 int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer)
 {
-    if (raw_pointer == NULL || cHeader == NULL) {
+    if (raw_pointer == NULL || cHeader == NULL ) {
         return 0;
     }
-    else {
-        switch(cHeader->frame_control[0]) {
+
+    switch(cHeader->frame_control[0]) {
         // probe request
         case PROBE_REQUEST:
+            break;
         // rts
-        case RTS:
-        sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1], 
-           cHeader->address2[2], cHeader->address2[3], cHeader->address2[4], cHeader->address2[5]);
-        break;
+        case RTS:{
+            sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1], 
+                cHeader->address2[2], cHeader->address2[3], cHeader->address2[4], cHeader->address2[5]);
+            //printf("address2:%s\n", raw_pointer->mac);
+            return 1;
+            }
+            break;
 
         // qos data
         case QOS_DATA:
-        break;
-        default:
-        break;
-        }
-        return 1;
+            break;
+
+        default: break;
     }
+    return 0;
 }
 
 // fill the data of station
@@ -312,12 +343,9 @@ int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA
     int radiotap_len = (l1 << 8) + l2;
     const IEEE80211_COMMON_HEADER * cHeader = (IEEE80211_COMMON_HEADER *)(packet + radiotap_len);
     // fill mac address
-    if (!getStationMAC(cHeader, raw_pointer))
-    {
-        // fail to fill mac
+    if (!(getStationMAC(cHeader, raw_pointer) && addNewStation(raw_pointer))) {
         return 0;
     }
-
     // fill rssi
     struct raw_hotspot_xml_data temp_raw = {"", "", 0, "", "", 0};
     getSignal(rHeader, packet, &temp_raw);

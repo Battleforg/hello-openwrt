@@ -9,32 +9,7 @@ char knownHotspotMAC[PACKET_NUMBER][20];
 // count the number of records
 int hotspot_records_count = 0;
 
-// record MAC addresses of know station
-char knownStaMAC[PACKET_NUMBER][20];
-// count the number of records
-int sta_records_count = 0;
 
-// add new station record to knownStaMAC
-int addNewStation(RAW_STA_XML_DATA* raw_pointer)
-{
-    // first find out if the staion has already in record.
-    int i;
-    for (i = 0; i < sta_records_count && i < PACKET_NUMBER; ++i) {
-        // if the hotspot is in record
-        if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
-            // do nothing but return 0 means old record is detected
-            return 0;
-        }   
-    }
-    // add new hotspot record and record is not full
-    if (sta_records_count < PACKET_NUMBER) {
-        strcpy(knownStaMAC[sta_records_count], raw_pointer->mac);
-    }
-    // update record count
-    sta_records_count++;
-    // new record has been added and return 1
-    return 1;
-}
 
 // add new hotspot record to knownHotspotMAC
 int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer)
@@ -164,13 +139,12 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
             save_hotspot(tmp);
         }
 
-        // if not a beacon frame
+    // if not a beacon frame
     }  else {
     // if it some frame like RTS transmitted by station
-       fillStaData(rHeader, packet, &raw_sta, pkthdr);
+       //fillStaData(rHeader, packet, &raw_sta, pkthdr);
        // if station is a new record
-       if (addNewStation(&raw_sta))
-       {
+       if (fillStaData(rHeader, packet, &raw_sta, pkthdr)) {
            save_sta(&raw_sta);
        }
     }
@@ -183,10 +157,10 @@ int main()
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    char *dev=(char *)"wlan0";
+    //char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    //char* dev=(char *)"en0";
+    char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     

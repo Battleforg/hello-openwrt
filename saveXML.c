@@ -40,10 +40,11 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     fprintf(stream, "</MESSAGE>\n");
     fclose(stream);
 
-    /*print*/
-    printf("------------------%d----------------------\n", hotspot_count);
+    /*print
+    printf("------hotspot------------%d----------------------\n", hotspot_count);
     printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi, 
         hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
+*/
 }
 
 void save_sta(struct raw_sta_xml_data* sta_pointer) 
@@ -88,4 +89,10 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     fprintf(stream, "\t</DATASET>\n");
     fprintf(stream, "</MESSAGE>\n");
     fclose(stream);
+    /*print*/
+    printf("-----------sta-------%d----------------------\n", sta_count);
+    printf(" MAC:%s\n rssi:%d recieved time:%s\n", sta_pointer->mac, sta_pointer->rssi, 
+        sta_pointer->recieved_time);
+
+
 }

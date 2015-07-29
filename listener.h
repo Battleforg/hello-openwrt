@@ -110,20 +110,20 @@
 #define MY_CIPHER_CKIP          (1 << 7)
 
 #define MY_KMGMT_NONE          (1 << 0)
-#define MY_KMGMT_8021X          (1 << 1)
-#define MY_KMGMT_PSK              (1 << 2)
+#define MY_KMGMT_8021X         (1 << 1)
+#define MY_KMGMT_PSK           (1 << 2)
 
-#define MY_AUTH_OPEN              (1 << 0)
+#define MY_AUTH_OPEN            (1 << 0)
 #define MY_AUTH_SHARED          (1 << 1)
 
-#define RSN                                    0x30
+#define RSN                       0x30
 #define VERDOR_SPECIFIC           0xdd
 
 // type/subtype
-#define BEACON_FRAME              0x80
-#define PROBE_REQUEST              0x40
-#define QOS_DATA                        0x88
-#define RTS                                      0xb4 
+#define BEACON_FRAME            0x80
+#define PROBE_REQUEST           0x40
+#define QOS_DATA                0x88
+#define RTS                     0xb4 
 
 
 #define PACKET_NUMBER            500

@@ -2,18 +2,46 @@
 #include "saveXML.h"
 
 struct raw_hotspot_xml_data raw;
+struct raw_sta_xml_data raw_sta;
 
 //  record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
 // count the number of records
-int records_count = 0;
+int hotspot_records_count = 0;
+
+// record MAC addresses of know station
+char knownStaMAC[PACKET_NUMBER][20];
+// count the number of records
+int sta_records_count = 0;
+
+// add new station record to knownStaMAC
+int addNewStation(RAW_STA_XML_DATA* raw_pointer)
+{
+    // first find out if the staion has already in record.
+    int i;
+    for (i = 0; i < sta_records_count && i < PACKET_NUMBER; ++i) {
+        // if the hotspot is in record
+        if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
+            // do nothing but return 0 means old record is detected
+            return 0;
+        }   
+    }
+    // add new hotspot record and record is not full
+    if (sta_records_count < PACKET_NUMBER) {
+        strcpy(knownStaMAC[sta_records_count], raw_pointer->mac);
+    }
+    // update record count
+    sta_records_count++;
+    // new record has been added and return 1
+    return 1;
+}
 
 // add new hotspot record to knownHotspotMAC
-int addNewHotspot(struct raw_hotspot_xml_data* raw_pointer)
+int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer)
 {
     // first find out if the hotspot has already in record.
     int i;
-    for (i = 0; i < records_count && i < PACKET_NUMBER; ++i) {
+    for (i = 0; i < hotspot_records_count && i < PACKET_NUMBER; ++i) {
         // if the hotspot is in record
         if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i])) {
             // do nothing but return 0 means old record is detected
@@ -21,11 +49,11 @@ int addNewHotspot(struct raw_hotspot_xml_data* raw_pointer)
         }   
     }
     // add new hotspot record and record is not full
-    if (records_count < PACKET_NUMBER) {
-        strcpy(knownHotspotMAC[records_count], raw_pointer->mac);
+    if (hotspot_records_count < PACKET_NUMBER) {
+        strcpy(knownHotspotMAC[hotspot_records_count], raw_pointer->mac);
     }
     // update record count
-    records_count++;
+    hotspot_records_count++;
     // new record has been added and return 1
     return 1;
 }
@@ -137,13 +165,14 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
         }
 
         // if not a beacon frame
-    } else {
-        //printf("----------------------------------------\n");
-        //printf("id: %d\n", ++(*id));
-        //printf("not beacon frame\n");
-        // get time
-        //printf("Recieved time: %s", ctime((const time_t *)&pkthdr->ts.tv_sec)); 
-
+    }  else {
+    // if it some frame like RTS transmitted by station
+       fillStaData(rHeader, packet, &raw_sta, pkthdr);
+       // if station is a new record
+       if (addNewStation(&raw_sta))
+       {
+           save_sta(&raw_sta);
+       }
     }
 }
 

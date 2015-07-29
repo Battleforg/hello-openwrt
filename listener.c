@@ -1,7 +1,7 @@
 #include "listener.h"
 
 // get SIGNAL in dBm
-void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer)
+void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer)
 {
     // skip constant header
     const u_char * currentPos = (u_char*)(packet + 4);
@@ -69,14 +69,17 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
                 /* has noise */
                 shift += 1;
             }
+
             if (rHeader->present[4 * i] & IEEE80211_RADIOTAP_LOCK_QUALITY) {
                 /* has lock quality */
                 shift += 2;
             }
+
             if (rHeader->present[4 * i + 1] & IEEE80211_RADIOTAP_ANTENNA) {
                 /* has antenna */
                 shift += 1;
             }
+
             if (rHeader->present[4 * i + 1] & IEEE80211_RADIOTAP_RX_FLAGS) {
                 /* has RX flags */
                 if ((16 - shift) == 1) {
@@ -85,6 +88,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
                 }
                 shift += 2;
             }
+
             if (rHeader->present[4*i + 2] & HT_INFO)
             {
                 shift += 3;
@@ -101,7 +105,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct r
 }
 
 // get channel
-void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct raw_hotspot_xml_data* raw_pointer)
+void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer)
 {
     // skip constant header
     const u_char * currentPos  = (u_char*)(packet + 4);
@@ -201,7 +205,7 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct r
 }
 
 // print encryption informaiton
-void print_encry(ENCRYPTION * e, struct raw_hotspot_xml_data* raw_pointer)
+void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer)
 {
     // unknown encryption type
     if (!e) {
@@ -273,3 +277,54 @@ void print_encry(ENCRYPTION * e, struct raw_hotspot_xml_data* raw_pointer)
     }
 }
 
+// get station mac address from different kinds of packet
+int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer)
+{
+    if (raw_pointer == NULL || cHeader == NULL) {
+        return 0;
+    }
+    else {
+        switch(cHeader->frame_control[0]) {
+        // probe request
+        case PROBE_REQUEST:
+        // rts
+        case RTS:
+        sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1], 
+           cHeader->address2[2], cHeader->address2[3], cHeader->address2[4], cHeader->address2[5]);
+        break;
+
+        // qos data
+        case QOS_DATA:
+        break;
+        default:
+        break;
+        }
+        return 1;
+    }
+}
+
+// fill the data of station
+int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr)
+{
+     // calculate radiotap header length
+    int l1= rHeader->len[1];
+    int l2 = rHeader->len[0];
+    int radiotap_len = (l1 << 8) + l2;
+    const IEEE80211_COMMON_HEADER * cHeader = (IEEE80211_COMMON_HEADER *)(packet + radiotap_len);
+    // fill mac address
+    if (!getStationMAC(cHeader, raw_pointer))
+    {
+        // fail to fill mac
+        return 0;
+    }
+
+    // fill rssi
+    struct raw_hotspot_xml_data temp_raw = {"", "", 0, "", "", 0};
+    getSignal(rHeader, packet, &temp_raw);
+    raw_pointer->rssi = temp_raw.rssi;
+    
+    // fill recieved time
+    sprintf(raw_pointer->recieved_time, "%ld", pkthdr->ts.tv_sec);
+    // successful fill process
+    return 1;
+}

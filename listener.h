@@ -119,7 +119,12 @@
 #define RSN                                    0x30
 #define VERDOR_SPECIFIC           0xdd
 
+// type/subtype
 #define BEACON_FRAME              0x80
+#define PROBE_REQUEST              0x40
+#define QOS_DATA                        0x88
+#define RTS                                      0xb4 
+
 
 #define PACKET_NUMBER            500
 
@@ -177,6 +182,7 @@ struct ieee80211_common_header
     u_char frame_control[2];
     u_char duration[2];
     u_char address1[6]; 
+    u_char address2[6]; 
 };
 
 struct raw_sta_xml_data {
@@ -194,13 +200,16 @@ typedef struct raw_hotspot_xml_data RAW_HOTSPOT_XML_DATA;
 typedef struct ieee80211_common_header IEEE80211_COMMON_HEADER;
 typedef struct raw_sta_xml_data RAW_STA_XML_DATA;
 // get SIGNAL in dBm
-void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
+void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer);
 // get channel
-void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, struct raw_hotspot_xml_data* raw_pointer);
+void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer);
 // print encryption informaiton
-void print_encry(ENCRYPTION * e, struct raw_hotspot_xml_data* raw_pointer);
+void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer);
 // get station mac address from different kinds of packet
-void getStationMAC(IEEE80211_COMMON_HEADER * cHeader);
+int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer);
+
+// fill the data of station
+int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr);
 
 #endif              /* LISTENER_H */
 

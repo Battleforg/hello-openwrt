@@ -314,7 +314,12 @@ int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw
 
     switch(cHeader->frame_control[0]) {
         // probe request
-        case PROBE_REQUEST:
+        case PROBE_REQUEST:{
+            sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1], 
+                cHeader->address2[2], cHeader->address2[3], cHeader->address2[4], cHeader->address2[5]);
+            //printf("address2:%s\n", raw_pointer->mac);
+            return 1;
+            }
             break;
         // rts
         case RTS:{
@@ -325,9 +330,7 @@ int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw
             }
             break;
 
-        // qos data
-        case QOS_DATA:
-            break;
+     
 
         default: break;
     }

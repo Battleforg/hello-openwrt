@@ -157,10 +157,10 @@ int main()
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    //char *dev=(char *)"wlan0";
+    char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    char* dev=(char *)"en0";
+    //char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     

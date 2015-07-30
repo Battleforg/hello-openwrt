@@ -244,61 +244,25 @@ void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer)
         // wep
         if (!e->wpa_version) {
             // output encryption type to struct RAW_HOTSPOT_XML_DATA pointed by raw_pointer
-            sprintf(raw_pointer->encryption_type, "WEP");
+            sprintf(raw_pointer->encryption_type, "01");     // wep
         }
         // wpa
         else {
             int pos = 0;
             switch(e->wpa_version) {
                 case 3:
-                pos = sprintf(raw_pointer->encryption_type, "mixed WPA/WPA2"); 
+                pos = sprintf(raw_pointer->encryption_type, "99");  // wpa/wpa2
                 break;
 
                 case 2:
-                pos = sprintf(raw_pointer->encryption_type, "WPA2"); 
+                pos = sprintf(raw_pointer->encryption_type, "03");   // wpa2
                 break;
 
                 case 1: 
-                pos = sprintf(raw_pointer->encryption_type, "WPA"); 
+                pos = sprintf(raw_pointer->encryption_type, "02");   // wpa
                 break;
                 default: 
                 break;
-            }
-
-            // group ciphers
-            switch(e->group_ciphers) {
-                case MY_CIPHER_NONE:
-                sprintf(raw_pointer->encryption_type + pos, "NONE");  
-                break;
-
-                case MY_CIPHER_WEP40:
-                sprintf(raw_pointer->encryption_type + pos, "WEP40"); 
-                break;
-
-                case MY_CIPHER_TKIP:
-                sprintf(raw_pointer->encryption_type + pos, "TKIP"); 
-                break;
-
-                case MY_CIPHER_WRAP:
-                sprintf(raw_pointer->encryption_type + pos, "WRAP"); 
-                break;
-
-                case MY_CIPHER_CCMP:
-                sprintf(raw_pointer->encryption_type + pos, "CCMP"); 
-                break;
-
-                case MY_CIPHER_WEP104:
-                sprintf(raw_pointer->encryption_type + pos, "WEP104"); 
-                break;
-
-                case MY_CIPHER_AESOCB:
-                sprintf(raw_pointer->encryption_type + pos, "AESOCB"); 
-                break;
-
-                case MY_CIPHER_CKIP:
-                sprintf(raw_pointer->encryption_type + pos, "CKIP"); 
-                break;
-
             }
         }
     }

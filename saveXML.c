@@ -5,7 +5,7 @@ int hotspot_count = 0;
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) 
 {
     FILE* stream;
-    char filename [58] = "data/145-510002-";
+    char filename [65] = "data/hotspot/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -55,7 +55,7 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
 void save_sta(struct raw_sta_xml_data* sta_pointer) 
 {
     FILE* stream;
-    char filename [58] = "data/145-510002-";
+    char filename [65] = "data/station/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);

@@ -83,7 +83,7 @@ int main()
      
     int id = 0;
     /* wait loop until PACKET_NUMBER */
-    pcap_loop(handle, PACKET_NUMBER, getPacket, (u_char*)&id);
+    pcap_loop(handle, -1, getPacket, (u_char*)&id);
   
     pcap_close(handle);
     return 0;

@@ -1,7 +1,7 @@
 /* $FreeBSD: src/sys/net80211/ieee80211_radiotap.h,v 1.5 2005/01/22 20:12:05 sam Exp $ */
 /* $NetBSD: ieee80211_radiotap.h,v 1.11 2005/06/22 06:16:02 dyoung Exp $ */
 
-/*-
+/**
  * Copyright (c) 2003, 2004 David Young.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -104,7 +104,7 @@
 #define MY_CIPHER_WEP40     (1 << 1)
 #define MY_CIPHER_TKIP      (1 << 2)
 #define MY_CIPHER_WRAP      (1 << 3)
-#define MY_CIPHER_CCM       (1 << 4)
+#define MY_CIPHER_CCMP      (1 << 4)
 #define MY_CIPHER_WEP104    (1 << 5)
 #define MY_CIPHER_AESOCB    (1 << 6)
 #define MY_CIPHER_CKIP      (1 << 7)
@@ -207,7 +207,9 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, RAW_HOTS
 void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer);
 // get station mac address from different kinds of packet
 int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer);
-
+// record
+int addNewStation(RAW_STA_XML_DATA* raw_pointer);
+int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer);
 // fill the data of station
 int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr);
 int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr);

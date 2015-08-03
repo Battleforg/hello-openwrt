@@ -175,7 +175,7 @@ void refreshAndUpload()
 
     // delete all old file
     char cmd[40] = {0};
-    char hotspot[40] = "data/hotspot/a.xml";
+    char hotspot[40] = "data/hotspot/*.xml";
     sprintf(cmd, "rm -f %s", hotspot);
     if (system (cmd) == -1)
     {

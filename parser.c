@@ -48,15 +48,15 @@ int main()
     else {
         printf("Opened device %s\n",dev);
     }
-    
+    /*
     if(pcap_can_set_rfmon(handle)) {    
          //查看是否能设置为监控模式
         //printf("Device %s can be opened in monitor mode\n",dev);
     }
     else {
-            //printf("Device %s can't be opened in monitor mode!!!\n",dev);
+        //printf("Device %s can't be opened in monitor mode!!!\n",dev);
     }
-    
+    */
     pcap_set_rfmon(handle,0);   //设置为监控模式
      
     if(pcap_set_rfmon(handle,1)!=0) { 
@@ -77,8 +77,8 @@ int main()
         
     header_type=pcap_datalink(handle);  //返回链路层的类型
     if(header_type!=DLT_IEEE802_11_RADIO) {
-            //printf("Error: incorrect header type - %d",header_type);
-            return 0;            
+        //printf("Error: incorrect header type - %d",header_type);
+        return 0;            
     }
      
     int id = 0;

@@ -102,12 +102,12 @@
 
 #define MY_CIPHER_NONE      (1 << 0)
 #define MY_CIPHER_WEP40     (1 << 1)
-#define MY_CIPHER_TKIP         (1 << 2)
-#define MY_CIPHER_WRAP       (1 << 3)
-#define MY_CIPHER_CCMP       (1 << 4)
-#define MY_CIPHER_WEP104   (1 << 5)
-#define MY_CIPHER_AESOCB   (1 << 6)
-#define MY_CIPHER_CKIP          (1 << 7)
+#define MY_CIPHER_TKIP      (1 << 2)
+#define MY_CIPHER_WRAP      (1 << 3)
+#define MY_CIPHER_CCM       (1 << 4)
+#define MY_CIPHER_WEP104    (1 << 5)
+#define MY_CIPHER_AESOCB    (1 << 6)
+#define MY_CIPHER_CKIP      (1 << 7)
 
 #define MY_KMGMT_NONE          (1 << 0)
 #define MY_KMGMT_8021X         (1 << 1)
@@ -126,7 +126,7 @@
 #define RTS                     0xb4 
 
 
-#define PACKET_NUMBER            500
+#define PACKET_NUMBER           1000
 
 
 struct radiotap_c_header

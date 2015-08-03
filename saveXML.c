@@ -1,6 +1,30 @@
 #include "saveXML.h"
-int sta_count = 0;
-int hotspot_count = 0;
+
+//record  MAC addresses of  known hotspot
+char knownHotspotMAC[PACKET_NUMBER][20];
+// count the number of records
+int hotspot_records_count = 0; 
+
+// add new hotspot record to knownHotspotMAC
+int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
+    // first find out if the hotspot has already in record.
+    int i;
+    for (i = 0; i < hotspot_records_count && i < PACKET_NUMBER; ++i) {
+        // if the hotspot is in record
+        if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i])) {
+            // do nothing but return 0 means old record is detected
+            return 0;
+        }   
+    }
+    // add new hotspot record and record is not full
+    if (hotspot_records_count < PACKET_NUMBER) {
+        strcpy(knownHotspotMAC[hotspot_records_count], raw_pointer->mac);
+    }
+    // update record count
+    hotspot_records_count++;
+    // new record has been added and return 1
+    return 1;
+}
 
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) 
 {
@@ -13,8 +37,7 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     char* line = "-";
     strcat(filename,line);  
     char str[6];
-    sprintf(str,"%05d",hotspot_count);
-    hotspot_count++;
+    sprintf(str,"%05d",hotspot_records_count);
     strcat(filename,str); 
     char* back = "-WA_SOURCE_FJ_1002-0.xml";
     strcat(filename,back);
@@ -42,7 +65,6 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
         fclose(stream);
     } else {
         printf("fail to save xml!\n");
-
     }
 
     /*print
@@ -50,6 +72,33 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi, 
         hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
 */
+}
+
+
+// record MAC addresses of know station
+char knownStaMAC[PACKET_NUMBER][20];
+// count the number of records
+int sta_records_count = 0;
+
+// add new station record to knownStaMAC
+int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
+    // first find out if the staion has already in record.
+    int i;
+    for (i = 0; i < sta_records_count && i < PACKET_NUMBER; ++i) {
+        // if the hotspot is in record
+        if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
+            // do nothing but return 0 means old record is detected
+            return 0;
+        }   
+    }
+    // add new hotspot record and record is not full
+    if (sta_records_count < PACKET_NUMBER) {
+        strcpy(knownStaMAC[sta_records_count], raw_pointer->mac);
+    }
+    // update record count
+    sta_records_count++;
+    // new record has been added and return 1
+    return 1;
 }
 
 void save_sta(struct raw_sta_xml_data* sta_pointer) 
@@ -63,8 +112,7 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     char* line = "-";
     strcat(filename,line);  
     char str[6];
-    sprintf(str,"%05d",sta_count);
-    sta_count++;
+    sprintf(str,"%05d",sta_records_count);
     strcat(filename,str); 
     char* back = "-WA_SOURCE_FJ_1001-0.xml";
     strcat(filename,back);

@@ -248,18 +248,17 @@ void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer)
         }
         // wpa
         else {
-            int pos = 0;
             switch(e->wpa_version) {
                 case 3:
-                pos = sprintf(raw_pointer->encryption_type, "99");  // wpa/wpa2
+                sprintf(raw_pointer->encryption_type, "99");  // wpa/wpa2
                 break;
 
                 case 2:
-                pos = sprintf(raw_pointer->encryption_type, "03");   // wpa2
+                sprintf(raw_pointer->encryption_type, "03");   // wpa2
                 break;
 
                 case 1: 
-                pos = sprintf(raw_pointer->encryption_type, "02");   // wpa
+                sprintf(raw_pointer->encryption_type, "02");   // wpa
                 break;
                 default: 
                 break;
@@ -439,3 +438,4 @@ int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA
     // successful fill process
     return 1;
 }
+

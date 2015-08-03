@@ -4,8 +4,17 @@
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
 
+long globalSecond;
+
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet)
 {
+    long seconds = time((time_t*)NULL);
+    // upload interval is 30s
+    if (seconds - globalSecond > 30) {
+        refreshAndUpload();
+        globalSecond = seconds;
+        return;
+    }
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
     // calculate radiotap header length
     int l1= rHeader->len[1];
@@ -27,17 +36,17 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     
 }
 
-int main()
+int myPcapCatchAndAnaly()
 {
     int status=0;
     int header_type; 
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    //char *dev=(char *)"wlan0";
+    char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    char* dev=(char *)"en0";
+    //char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     
@@ -82,9 +91,16 @@ int main()
     }
      
     int id = 0;
+    globalSecond = time((time_t*)NULL);
     /* wait loop until PACKET_NUMBER */
     pcap_loop(handle, PACKET_NUMBER, getPacket, (u_char*)&id);
   
     pcap_close(handle);
+    return 0;
+}
+
+int main()
+{
+    myPcapCatchAndAnaly();
     return 0;
 }

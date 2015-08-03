@@ -96,3 +96,27 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
 
 
 }
+
+
+// refresh known data of station and hotspot
+void refreshAndUpload()
+{
+    // clear known station and hotspot
+    int i;
+    for (i = 0; i < hotspot_records_count; ++i)
+    {
+        memset(knownHotspotMAC[i], 0, sizeof(knownHotspotMAC[i]));
+    }
+    hotspot_records_count = 0;
+    for (i = 0; i < sta_records_count; ++i)
+    {
+        memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
+    }
+    sta_records_count = 0;
+
+    // compress and upload
+
+    // delete all old file
+    char filename[80] = "*.xml";
+    remove(filename);
+}

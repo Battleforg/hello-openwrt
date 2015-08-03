@@ -208,9 +208,11 @@ void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer);
 // get station mac address from different kinds of packet
 int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer);
 
-// fill the data of station
+// fill the data of station and hotspot
 int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr);
 int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr);
+
+
 
 #endif              /* LISTENER_H */
 

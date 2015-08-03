@@ -10,7 +10,7 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
 {
     long seconds = time((time_t*)NULL);
     // upload interval is 30s
-    if (seconds - globalSecond > 30) {
+    if (seconds - globalSecond > 5) {
         refreshAndUpload();
         globalSecond = seconds;
         return;

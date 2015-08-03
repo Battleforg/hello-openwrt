@@ -174,6 +174,21 @@ void refreshAndUpload()
     // compress and upload
 
     // delete all old file
-    char filename[80] = "*.xml";
-    remove(filename);
+    char cmd[40] = {0};
+    char hotspot[40] = "data/hotspot/a.xml";
+    sprintf(cmd, "rm -f %s", hotspot);
+    if (system (cmd) == -1)
+    {
+        printf("delete file fail\n");
+    }
+    else{
+        printf("Success\n");
+    }
+    char station[40] = "data/station/*.xml";
+     sprintf(cmd, "rm -f %s", station);
+    if (system (cmd) == -1)
+    {
+        printf("delete file fail\n");
+    }
+    printf("!!!\n");
 }

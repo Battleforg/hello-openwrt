@@ -1,31 +1,6 @@
 #include "listener.h"
 /****************************hotspot*************************************/
-//record  MAC addresses of  known hotspot
-char knownHotspotMAC[PACKET_NUMBER][20];
-// count the number of records
-int hotspot_records_count = 0;
 
-// add new hotspot record to knownHotspotMAC
-int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer)
-{
-    // first find out if the hotspot has already in record.
-    int i;
-    for (i = 0; i < hotspot_records_count && i < PACKET_NUMBER; ++i) {
-        // if the hotspot is in record
-        if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i])) {
-            // do nothing but return 0 means old record is detected
-            return 0;
-        }   
-    }
-    // add new hotspot record and record is not full
-    if (hotspot_records_count < PACKET_NUMBER) {
-        strcpy(knownHotspotMAC[hotspot_records_count], raw_pointer->mac);
-    }
-    // update record count
-    hotspot_records_count++;
-    // new record has been added and return 1
-    return 1;
-}
 
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer)
@@ -356,33 +331,6 @@ int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW
 }
 
 /****************************station*************************************/
-
-// record MAC addresses of know station
-char knownStaMAC[PACKET_NUMBER][20];
-// count the number of records
-int sta_records_count = 0;
-
-// add new station record to knownStaMAC
-int addNewStation(RAW_STA_XML_DATA* raw_pointer)
-{
-    // first find out if the staion has already in record.
-    int i;
-    for (i = 0; i < sta_records_count && i < PACKET_NUMBER; ++i) {
-        // if the hotspot is in record
-        if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
-            // do nothing but return 0 means old record is detected
-            return 0;
-        }   
-    }
-    // add new hotspot record and record is not full
-    if (sta_records_count < PACKET_NUMBER) {
-        strcpy(knownStaMAC[sta_records_count], raw_pointer->mac);
-    }
-    // update record count
-    sta_records_count++;
-    // new record has been added and return 1
-    return 1;
-}
 
 // get station mac address from different kinds of packet
 int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer)

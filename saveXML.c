@@ -1,4 +1,7 @@
 #include "saveXML.h"
+// #include "ziptest.h"
+#include "upload.h"
+#include "delete.h"
 
 //record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
@@ -152,4 +155,32 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
         sta_pointer->recieved_time);
 */
 
+}
+
+
+// refresh known data of station and hotspot
+void refreshAndUpload()
+{
+    // clear known station and hotspot
+    int i;
+    for (i = 0; i < hotspot_records_count; ++i)
+    {
+        memset(knownHotspotMAC[i], 0, sizeof(knownHotspotMAC[i]));
+    }
+    hotspot_records_count = 0;
+    for (i = 0; i < sta_records_count; ++i)
+    {
+        memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
+    }
+    sta_records_count = 0;
+
+    // compress and upload
+    // compress("data","zip/data.zip");
+    system("zip -r -q zip/data.zip data");
+    upload("zip/data.zip");
+    // delete all old file
+    remove_dir("data/hotspot");
+    remove_dir("data/station");
+    remove_dir("zip");
+    printf("!!!\n");
 }

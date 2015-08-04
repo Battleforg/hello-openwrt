@@ -55,18 +55,18 @@ void remove_dir(const char *path_raw)
     dfs_remove_dir();
     chdir(old_path);
 
-    /*
-       如果你想删除该目录本身的话,取消注释
-       unlink(old_path); 
-     */
+    
+       // 如果你想删除该目录本身的话,取消注释
+    // unlink(old_path); 
+     
 }
 
 // int main(int argc, char* argv[])
 // {
-    // if (argc > 1)
-    // {
-        // remove_dir("/home/lyk/temptttt/inc");
-    // }
+//     // if (argc > 1)
+//     // {
+//         remove_dir("/home/lyk/temptttt/data");
+//     // }
 
-    // return 0;
+//     return 0;
 // }

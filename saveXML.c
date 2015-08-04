@@ -1,4 +1,7 @@
 #include "saveXML.h"
+// #include "ziptest.h"
+#include "upload.h"
+#include "delete.h"
 
 //record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
@@ -172,23 +175,19 @@ void refreshAndUpload()
     sta_records_count = 0;
 
     // compress and upload
+    // system("zip -r -q zip/data.zip data");
+    // upload("zip/data.zip");
+
+    system("zip -r -q /tmp/group2/zip/data.zip data");
+    upload("/tmp/group2/zip/data.zip");
 
     // delete all old file
-    char cmd[40] = {0};
-    char hotspot[40] = "data/hotspot/*.xml";
-    sprintf(cmd, "rm -f %s", hotspot);
-    if (system (cmd) == -1)
-    {
-        printf("delete file fail\n");
-    }
-    else{
-        printf("Success\n");
-    }
-    char station[40] = "data/station/*.xml";
-     sprintf(cmd, "rm -f %s", station);
-    if (system (cmd) == -1)
-    {
-        printf("delete file fail\n");
-    }
+    // remove_dir("data/hotspot");
+    // remove_dir("data/station");
+    // remove_dir("zip");
+
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
     printf("!!!\n");
 }

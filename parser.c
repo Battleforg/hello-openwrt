@@ -43,10 +43,10 @@ int myPcapCatchAndAnaly()
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
-    char *dev=(char *)"wlan0";
+    //char *dev=(char *)"wlan0";
     
     /* macbook pro */
-    //char* dev=(char *)"en0";
+    char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
     
@@ -99,13 +99,19 @@ int myPcapCatchAndAnaly()
     return 0;
 }
 
-int main()
-{
-     system("mkdir data");
-     system("cp GAB_ZIP_INDEX.xml data");
-     system("mkdir data/hotspot");
-     system("mkdir data/station");
-     system("mkdir zip");
-     myPcapCatchAndAnaly();
-     return 0;
+int main() {
+    //system("mkdir -m 777 data");
+    //system("cp GAB_ZIP_INDEX.xml data");
+    //system("mkdir -m 777  data/hotspot");
+    //system("mkdir -m 777  data/station");
+    //system("mkdir -m 777  zip");
+
+    system("mkdir -m 777 /tmp/group2/data");
+    system("cp GAB_ZIP_INDEX.xml /tmp/group2/data");
+    system("mkdir -m 777  /tmp/group2/data/hotspot");
+    system("mkdir -m 777  /tmp/group2/data/station");
+    system("mkdir -m 777  /tmp/group2/zip");
+
+    myPcapCatchAndAnaly();
+    return 0;
 }

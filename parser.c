@@ -99,21 +99,19 @@ int myPcapCatchAndAnaly()
     return 0;
 }
 
-int main()
-{
+int main() {
+    //system("mkdir -m 777 data");
+    //system("cp GAB_ZIP_INDEX.xml data");
+    //system("mkdir -m 777  data/hotspot");
+    //system("mkdir -m 777  data/station");
+    //system("mkdir -m 777  zip");
 
-     system("mkdir data");
-     system("cp GAB_ZIP_INDEX.xml data");
-     system("mkdir data/hotspot");
-     system("mkdir data/station");
-     system("mkdir zip");
-/*
-     system("mkdir -m 777 data");
-     system("cp GAB_ZIP_INDEX.xml data");
-     system("mkdir -m 777  data/hotspot");
-     system("mkdir -m 777  data/station");
-     system("mkdir -m 777  zip");
-*/
-     myPcapCatchAndAnaly();
-     return 0;
+    system("mkdir -m 777 /tmp/group2/data");
+    system("cp GAB_ZIP_INDEX.xml /tmp/group2/data");
+    system("mkdir -m 777  /tmp/group2/data/hotspot");
+    system("mkdir -m 777  /tmp/group2/data/station");
+    system("mkdir -m 777  /tmp/group2/zip");
+
+    myPcapCatchAndAnaly();
+    return 0;
 }

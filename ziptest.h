@@ -14,3 +14,4 @@
 
 void search_dir ( const char * name );
 void compress(const char *folderpath,const char *destzipname);
+// -lzip

@@ -96,3 +96,9 @@ void compress(const char *folderpath,const char *destzipname){
     	LOGE("operated zip fail for %s\n", strerr);
     }
 }
+
+// int main(int argc, char const *argv[])
+// {
+// 	compress("../data/1","../zip/xuxin.zip");
+// 	return 0;
+// }

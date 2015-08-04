@@ -10,4 +10,6 @@
 /* curl stuff */
 #include <curl/curl.h>
 
-void upload(void);
+void upload( const char * zipname);
+
+// -lcurl

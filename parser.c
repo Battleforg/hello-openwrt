@@ -101,6 +101,11 @@ int myPcapCatchAndAnaly()
 
 int main()
 {
-    myPcapCatchAndAnaly();
-    return 0;
+     system("mkdir data");
+     system("cp GAB_ZIP_INDEX.xml data");
+     system("mkdir data/hotspot");
+     system("mkdir data/station");
+     system("mkdir zip");
+     myPcapCatchAndAnaly();
+     return 0;
 }

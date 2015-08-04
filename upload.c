@@ -1,6 +1,6 @@
 #include "upload.h"
 
-void upload(void){
+void upload( const char * zipname){
   CURL *curl;
   CURLcode res;
   FILE *in;
@@ -8,15 +8,12 @@ void upload(void){
   char *data;
   int len;
 
-  stat("inc.zip", &file_info);
+  stat(zipname, &file_info);
   off_t uploadsize = file_info.st_size;
 
-  in = fopen("inc.zip", "rb");
-  fseek(in,0,SEEK_END); 
-  len = ftell(in); 
-  fseek(in,0,SEEK_SET);
-  data = (char*)malloc(sizeof(char)*(len+1));
-  fread(data,sizeof(char),len,in);
+  in = fopen(zipname, "rb");
+  data = (char*)malloc(sizeof(char)*(uploadsize));
+  fread(data,sizeof(char),uploadsize,in);
 
   /* In windows, this will init the winsock stuff */
   curl_global_init(CURL_GLOBAL_ALL);
@@ -25,17 +22,19 @@ void upload(void){
   curl = curl_easy_init();
   if(curl) {
 
-    /* upload please */
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+    // /* upload please */
+    // curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     /* First set the URL that is about to receive our POST. This URL can
        just as well be a https:// URL if that is what should receive the
        data. */
-    curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=liuyk5&filename=inc.zip");
+    curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=liuyk5&filename=data.zip");
     /* Now specify the POST data */
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS,data);
 
-    /* now specify which pointer to pass to our callback */
-    curl_easy_setopt(curl, CURLOPT_READDATA, in);
+    //  now specify which pointer to pass to our callback 
+    // curl_easy_setopt(curl, CURLOPT_READDATA, in);
 
     /* Set the size of the file to upload */
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, uploadsize);
@@ -52,3 +51,9 @@ void upload(void){
   }
   curl_global_cleanup();
 }
+
+// int main(int argc, char const *argv[])
+// {
+// 	upload("README.zip");
+// 	return 0;
+// }

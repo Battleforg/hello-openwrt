@@ -56,8 +56,3 @@ void upload( const char * zipname){
   curl_global_cleanup();
 }
 
-// int main(int argc, char const *argv[])
-// {
-// 	upload("README.zip");
-// 	return 0;
-// }

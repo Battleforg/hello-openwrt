@@ -1,4 +1,7 @@
 #include "listener.h"
+#include "saveXML.h"
+/****************************hotspot*************************************/
+
 
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer)
@@ -217,93 +220,118 @@ void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer)
         // wep
         if (!e->wpa_version) {
             // output encryption type to struct RAW_HOTSPOT_XML_DATA pointed by raw_pointer
-            sprintf(raw_pointer->encryption_type, "WEP");
+            sprintf(raw_pointer->encryption_type, "01");     // wep
         }
         // wpa
         else {
-            int pos = 0;
             switch(e->wpa_version) {
                 case 3:
-                pos = sprintf(raw_pointer->encryption_type, "mixed WPA/WPA2"); 
+                sprintf(raw_pointer->encryption_type, "99");  // wpa/wpa2
                 break;
 
                 case 2:
-                pos = sprintf(raw_pointer->encryption_type, "WPA2"); 
+                sprintf(raw_pointer->encryption_type, "03");   // wpa2
                 break;
 
                 case 1: 
-                pos = sprintf(raw_pointer->encryption_type, "WPA"); 
+                sprintf(raw_pointer->encryption_type, "02");   // wpa
                 break;
                 default: 
                 break;
             }
-
-            // group ciphers
-            switch(e->group_ciphers) {
-                case MY_CIPHER_NONE:
-                sprintf(raw_pointer->encryption_type + pos, "NONE");  
-                break;
-
-                case MY_CIPHER_WEP40:
-                sprintf(raw_pointer->encryption_type + pos, "WEP40"); 
-                break;
-
-                case MY_CIPHER_TKIP:
-                sprintf(raw_pointer->encryption_type + pos, "TKIP"); 
-                break;
-
-                case MY_CIPHER_WRAP:
-                sprintf(raw_pointer->encryption_type + pos, "WRAP"); 
-                break;
-
-                case MY_CIPHER_CCMP:
-                sprintf(raw_pointer->encryption_type + pos, "CCMP"); 
-                break;
-
-                case MY_CIPHER_WEP104:
-                sprintf(raw_pointer->encryption_type + pos, "WEP104"); 
-                break;
-
-                case MY_CIPHER_AESOCB:
-                sprintf(raw_pointer->encryption_type + pos, "AESOCB"); 
-                break;
-
-                case MY_CIPHER_CKIP:
-                sprintf(raw_pointer->encryption_type + pos, "CKIP"); 
-                break;
-
-            }
         }
     }
 }
 
-
-// record MAC addresses of know station
-char knownStaMAC[PACKET_NUMBER][20];
-// count the number of records
-int sta_records_count = 0;
-
-// add new station record to knownStaMAC
-int addNewStation(RAW_STA_XML_DATA* raw_pointer)
+int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr)
 {
-    // first find out if the staion has already in record.
+    int l1= rHeader->len[1];
+    int l2 = rHeader->len[0];
+    int radiotap_len = (l1 << 8) + l2;
+    // packet len which have not been visited yet
+    int len_count = pkthdr->len;
     int i;
-    for (i = 0; i < sta_records_count && i < PACKET_NUMBER; ++i) {
-        // if the hotspot is in record
-        if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
-            // do nothing but return 0 means old record is detected
-            return 0;
+    const IEEE80211BEACON_FRAME * bHeader = (IEEE80211BEACON_FRAME*)(packet + radiotap_len);
+    // get time
+    // output recieved time to struct RAW_HOTSPOT_XML_DATA raw
+    sprintf(raw_pointer->recieved_time, "%ld", pkthdr->ts.tv_sec);
+    // get signal
+    getSignal(rHeader, packet, raw_pointer);
+    // get channel
+    getChannel(rHeader, packet, raw_pointer);
+    // update len_count;
+    len_count -= radiotap_len;
+    // SOURCE MAC
+    // output source mac to struct RAW_HOTSPOT_XML_DATA raw
+    sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X", bHeader->address2[0], bHeader->address2[1], 
+           bHeader->address2[2], bHeader->address2[3], bHeader->address2[4], bHeader->address2[5]);
+    
+    if (!addNewHotspot(raw_pointer)) {
+        return 0;
+    }
+    if (bHeader -> ssid_tag_length) {
+        // get SSID 
+        for (i = 0; i < bHeader->ssid_tag_length; ++i) {
+            sprintf(raw_pointer->ssid + i, "%c", bHeader->ssid[i]);
         }   
+    } else {
+        //sprintf(raw_pointer->ssid, "Broadcast");
+        return 0;
     }
-    // add new hotspot record and record is not full
-    if (sta_records_count < PACKET_NUMBER) {
-        strcpy(knownStaMAC[sta_records_count], raw_pointer->mac);
+      
+    ENCRYPTION e;
+    e.wpa_version = 0;
+    e.group_ciphers = 0;
+    e.pair_ciphers = 0;
+    e.auth_algs = 0;
+
+    static unsigned char wpa_oui[3] = {0x00, 0x50, 0xf2};
+    static unsigned char wpa2_oui[3] = {0x00, 0x0f, 0xac};
+    // begin scan data to find rsn and wpa type 
+    const u_char * p_encryption = &(bHeader->ssid[bHeader->ssid_tag_length]);
+    len_count -= (38 + bHeader->ssid_tag_length);
+
+    while (len_count > 0) {
+        // get tag number;
+        int tag_num = *p_encryption;
+        // move to tag length and get it
+        p_encryption +=1;
+        len_count -= 1;
+        int tag_len = *p_encryption;
+        // if tag number is RSN
+        if (tag_num == RSN) {
+            if (!memcmp(p_encryption + 3, wpa_oui, 3)) {
+                e.wpa_version +=1;
+            } else if (!memcmp(p_encryption + 3, wpa2_oui, 3)) {
+                e.wpa_version +=2;
+            }
+
+            if (!memcmp(p_encryption + 3, wpa_oui, 3) || !memcmp(p_encryption + 3, wpa2_oui, 3)) {
+                switch(p_encryption[6]) {
+                    case 1: e.group_ciphers |= MY_CIPHER_WEP40; break;
+                    case 2: e.group_ciphers |= MY_CIPHER_TKIP; break;
+                    case 4: e.group_ciphers |= MY_CIPHER_CCMP; break;
+                    case 5: e.group_ciphers |= MY_CIPHER_WEP104; break;
+                    case 6: /* AES-128-MAC */ break;
+                    default: break;
+                }
+            }
+
+        // if tag is VERDOR_SPECIFIC
+        } else if (tag_num == VERDOR_SPECIFIC) {
+            if (!memcmp(p_encryption + 1, wpa_oui, 3) && p_encryption[4] == 1) {
+                e.wpa_version +=1;
+            }
+        }
+        p_encryption += (tag_len + 1);
+        len_count -= (tag_len + 1);
     }
-    // update record count
-    sta_records_count++;
-    // new record has been added and return 1
+    print_encry(&e, raw_pointer);
+    //printf("\n");
     return 1;
 }
+
+/****************************station*************************************/
 
 // get station mac address from different kinds of packet
 int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw_pointer)
@@ -340,7 +368,7 @@ int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw
 // fill the data of station
 int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA_XML_DATA* raw_pointer, const struct pcap_pkthdr * pkthdr)
 {
-     // calculate radiotap header length
+    // calculate radiotap header length
     int l1= rHeader->len[1];
     int l2 = rHeader->len[0];
     int radiotap_len = (l1 << 8) + l2;
@@ -359,3 +387,4 @@ int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA
     // successful fill process
     return 1;
 }
+

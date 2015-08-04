@@ -101,11 +101,17 @@ int myPcapCatchAndAnaly()
 
 int main()
 {
-     system("mkdir -m 777 data");
-     system("cp GAB_ZIP_INDEX.xml data");
-     system("mkdir -m 777  data/hotspot");
-     system("mkdir -m 777  data/station");
-     system("mkdir -m 777  zip");
+     // system("mkdir -m 777 data");
+     // system("cp GAB_ZIP_INDEX.xml data");
+     // system("mkdir -m 777  data/hotspot");
+     // system("mkdir -m 777  data/station");
+     // system("mkdir -m 777  zip");
+
+    system("mkdir -m 777 /tmp/group2/data");
+     system("cp GAB_ZIP_INDEX.xml /tmp/group2/data");
+     system("mkdir -m 777  /tmp/group2/data/hotspot");
+     system("mkdir -m 777  /tmp/group2/data/station");
+     system("mkdir -m 777  /tmp/group2/zip");
      myPcapCatchAndAnaly();
      return 0;
 }

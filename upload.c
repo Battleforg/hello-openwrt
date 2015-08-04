@@ -6,7 +6,7 @@ void upload( const char * zipname){
   FILE *in;
   struct stat file_info;
   char *data;
-  int len;
+  
 
   stat(zipname, &file_info);
   off_t uploadsize = file_info.st_size;
@@ -48,6 +48,10 @@ void upload( const char * zipname){
 
     /* always cleanup */
     curl_easy_cleanup(curl);
+
+    free(data);
+    fclose(in);
+
   }
   curl_global_cleanup();
 }

@@ -2,6 +2,7 @@
 #include "saveXML.h"
 #include "delete.h"
 
+#define GAP 5
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
 
@@ -10,7 +11,7 @@ long globalSecond;
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     long seconds = time((time_t*)NULL);
     // upload interval is 30s
-    if (seconds - globalSecond > 5) {
+    if (seconds - globalSecond > GAP) {
         refreshAndUpload();
         globalSecond = seconds;
         return;

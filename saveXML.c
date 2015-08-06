@@ -32,7 +32,7 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) 
 {
     FILE* stream;
-    char filename [65] = "data/hotspot/145-510002-";
+    char filename [65] = "/tmp/group2/data/hotspot/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -70,11 +70,11 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
         printf("fail to save xml!\n");
     }
 
-    /*print
-    printf("------hotspot------------%d----------------------\n", hotspot_count);
+
+    printf("------hotspot------------%d----------------------\n", hotspot_records_count);
     printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi, 
         hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
-*/
+
 }
 
 
@@ -107,7 +107,7 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
 void save_sta(struct raw_sta_xml_data* sta_pointer) 
 {
     FILE* stream;
-    char filename [65] = "data/station/145-510002-";
+    char filename [65] = "/tmp/group2/data/station/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -178,7 +178,7 @@ void refreshAndUpload()
     // system("zip -r -q zip/data.zip data");
     // upload("zip/data.zip");
 
-    system("zip -r -q /tmp/group2/zip/data.zip data");
+    system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
     upload("/tmp/group2/zip/data.zip");
     // delete all old file
     // remove_dir("data/hotspot");

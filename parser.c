@@ -68,15 +68,15 @@ int myPcapCatchAndAnaly()
     */
     pcap_set_rfmon(handle,0);   //设置为监控模式
      
-    if(pcap_set_rfmon(handle,1)!=0) { 
-        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-        return 0;
-    }
-    else {
-        printf("Device %s has been opened in monitor mode\n", dev);
-    }
-    pcap_set_promisc(handle,0);   //不设置混杂模式
-    pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
+    // if(pcap_set_rfmon(handle,1)!=0) { 
+    //     fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+    //     return 0;
+    // }
+    // else {
+    //     printf("Device %s has been opened in monitor mode\n", dev);
+    // }
+    // pcap_set_promisc(handle,0);   //不设置混杂模式
+    // pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
         
     status=pcap_activate(handle);   //激活
     if(status!=0) {
@@ -112,6 +112,9 @@ int main()
      // system("mkdir -m 777  /tmp/group2/data/hotspot");
      // system("mkdir -m 777  /tmp/group2/data/station");
      // system("mkdir -m 777  /tmp/group2/zip");
-     myPcapCatchAndAnaly();
-     return 0;
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
+    myPcapCatchAndAnaly();
+    return 0;
 }

@@ -1,5 +1,9 @@
 #include "listener.h"
 #include "saveXML.h"
+#include "delete.h"
+#include "upload.h"
+#include <sys/stat.h> 
+#include <unistd.h>
 
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
@@ -98,6 +102,12 @@ int myPcapCatchAndAnaly()
     pcap_close(handle);
     return 0;
 }
+ 
+void foldercrate( const char * foldername){
+    if(access(foldername,F_OK) != 0){
+        mkdir(foldername,0777);
+    }
+}
 
 int main()
 {
@@ -107,11 +117,10 @@ int main()
      // system("mkdir -m 777  data/station");
      // system("mkdir -m 777  zip");
 
-     // system("mkdir -m 777 /tmp/group2/data");
-     // system("cp GAB_ZIP_INDEX.xml /tmp/group2/data");
-     // system("mkdir -m 777  /tmp/group2/data/hotspot");
-     // system("mkdir -m 777  /tmp/group2/data/station");
-     // system("mkdir -m 777  /tmp/group2/zip");
+    foldercrate("/tmp/group2/data");
+    foldercrate("/tmp/group2/data/hotspot");
+    foldercrate("/tmp/group2/data/station");
+    foldercrate("/tmp/group2/zip");
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
     remove_dir("/tmp/group2/zip");

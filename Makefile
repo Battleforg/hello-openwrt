@@ -1,7 +1,7 @@
-OBJS = parser.o listener.o saveXML.o upload.o delete.o 
+OBJS = parser.o listener.o saveXML.o upload.o delete.o
 CC = gcc
 CFLAGS = -Wall -g
-INCLUDE = -I/usr/local/include 
+INCLUDE = -I/usr/local/include
 LDFLAGS = -L/usr/local/lib
 
 listener : $(OBJS)
@@ -16,8 +16,6 @@ upload.o : upload.c upload.h
 	$(CC) $(CFLAGS) -c upload.c -o upload.o
 delete.o : delete.c delete.h
 	$(CC) $(CFLAGS) -c delete.c -o delete.o
-# ziptest.o : ziptest.c ziptest.h
-	# $(CC) $(CFLAGS) -c ziptest.c -o ziptest.o $(INCLUDE)
 
 clean:
-	rm -rf *.o listener data/hotspot/*.xml data/station/*.xml 
+	rm -rf *.o listener data/hotspot/*.xml data/station/*.xml

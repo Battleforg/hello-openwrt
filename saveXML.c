@@ -1,12 +1,66 @@
 #include "saveXML.h"
-// #include "ziptest.h"
 #include "upload.h"
 #include "delete.h"
+
+//write GAB_ZIP_INDEX.xml
+void writeIndex() {
+    FILE* stream;
+    char filename[] = "GAB_ZIP_INDEX.xml";
+    if (fopen(filename, "w")) {
+        stream = fopen(filename, "w");
+        fprintf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        fprintf(stream, "<MESSAGE>\n");
+        fprintf(stream, "\t<DATASET name=\"WA_COMMON_010017\" ver=\"1.0\" rmk=\"数据文件索引信息\">\n");
+        fprintf(stream, "\t\t<DATA>\n");
+        fprintf(stream, "\t\t\t<DATASET name=\"WA_COMMON_010013\" rmk=\"BCP文件描述信息\">\n");
+        fprintf(stream, "\t\t\t\t<DATA>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"I010032\" val=\"\" rmk=\"列分隔符（缺少值时默认为换行符\\t）\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"I010033\" val=\"\" rmk=\"行分隔符（缺少值时默认为换行符\\n）\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"A010004\" val=\"WA_SOURCE_FJ_1001\" rmk=\"数据集代码\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"B050016\" val=\"145\" rmk=\"数据来源\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"G020013\" val=\"xxxxxx\" rmk=\"网安专用产品厂家组织机构代码\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"E010008\" val=\"510002\" rmk=\"数据采集地\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<!-- 描述BCP文件中的数据列顺序 -->\n");
+        fprintf(stream, "\t\t\t\t\t<DATASET name=\"WA_COMMON_010015\" rmk=\"BCP文件数据结构\">\n");
+        fprintf(stream, "\t\t\t\t\t\t<DATA>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"C040002\" eng=\"MAC\" chn=\"终端MAC地址\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"H010014\" eng=\"CAPTURE_TIME\" chn=\"采集时间\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"I070003\" eng=\"TERMINAL_FIELD STRENGTH\" chn=\"被采终端场强\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t</DATA>\n");
+        fprintf(stream, "\t\t\t\t\t</DATASET>\n");
+        fprintf(stream, "\t\t\t\t</DATA>\n");
+        fprintf(stream, "\t\t\t\t<DATA>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"I010032\" val=\"\" rmk=\"列分隔符（缺少值时默认为换行符\\t）\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"I010033\" val=\"\" rmk=\"行分隔符（缺少值时默认为换行符\\n）\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"A010004\" val=\"WA_SOURCE_FJ_1002\" rmk=\"数据集代码\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"B050016\" val=\"145\" rmk=\"数据来源\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"G020013\" val=\"xxxxxx\" rmk=\"网安专用产品厂家组织机构代码\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<ITEM key=\"E010008\" val=\"510002\" rmk=\"数据采集地\"/>\n");
+        fprintf(stream, "\t\t\t\t\t<!-- 描述BCP文件中的数据列顺序 -->\n");
+        fprintf(stream, "\t\t\t\t\t<DATASET name=\"WA_COMMON_010015\" rmk=\"BCP文件数据结构\">\n");
+        fprintf(stream, "\t\t\t\t\t\t<DATA>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"F030011\" eng=\"AP_MAC\" chn=\"热点MAC地址\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"F030001\" eng=\"AP_SSID\" chn=\"热点SSID\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"F030022\" eng=\"AP_CHANNEL\" chn=\"热点频道\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"B040025\" eng=\"mixed WPA/WPA2CCMP\" chn=\"热点加密类型\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"H010014\" eng=\"CAPTURE_TIME\" chn=\"采集时间\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t\t<ITEM key=\"F030023\" eng=\"AP_FIELD STRENGTH\" chn=\"热点场强\"/>\n");
+        fprintf(stream, "\t\t\t\t\t\t</DATA>\n");
+        fprintf(stream, "\t\t\t\t\t</DATASET>\n");
+        fprintf(stream, "\t\t\t\t</DATA>\n");
+        fprintf(stream, "\t\t\t\t<!-- 多种不同结构的文件可以使用多条记录描述 -->\n");
+        fprintf(stream, "\t\t\t</DATASET>\n");
+        fprintf(stream, "\t\t</DATA>\n");
+        fprintf(stream, "\t</DATASET>\n");
+        fprintf(stream, "</MESSAGE>\n");
+        fclose(stream);
+    }
+}
 
 //record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
 // count the number of records
-int hotspot_records_count = 0; 
+int hotspot_records_count = 0;
 
 // add new hotspot record to knownHotspotMAC
 int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
@@ -17,7 +71,7 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
         if (!strcmp(raw_pointer ->mac, knownHotspotMAC[i])) {
             // do nothing but return 0 means old record is detected
             return 0;
-        }   
+        }
     }
     // add new hotspot record and record is not full
     if (hotspot_records_count < PACKET_NUMBER) {
@@ -29,7 +83,7 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
     return 1;
 }
 
-void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) 
+void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
 {
     FILE* stream;
     char filename [65] = "/tmp/group2/data/hotspot/145-510002-";
@@ -38,10 +92,10 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     sprintf(curtime,"%010ld",seconds);
     strcat(filename,curtime);
     char* line = "-";
-    strcat(filename,line);  
+    strcat(filename,line);
     char str[6];
     sprintf(str,"%05d",hotspot_records_count);
-    strcat(filename,str); 
+    strcat(filename,str);
     char* back = "-WA_SOURCE_FJ_1002-0.xml";
     strcat(filename,back);
     if (fopen(filename, "w")) {
@@ -69,12 +123,9 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     } else {
         printf("fail to save xml!\n");
     }
-
-
     printf("------hotspot------------%d----------------------\n", hotspot_records_count);
-    printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi, 
+    printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
         hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
-
 }
 
 
@@ -92,7 +143,7 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
         if (!strcmp(raw_pointer ->mac, knownStaMAC[i])) {
             // do nothing but return 0 means old record is detected
             return 0;
-        }   
+        }
     }
     // add new hotspot record and record is not full
     if (sta_records_count < PACKET_NUMBER) {
@@ -104,7 +155,7 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
     return 1;
 }
 
-void save_sta(struct raw_sta_xml_data* sta_pointer) 
+void save_sta(struct raw_sta_xml_data* sta_pointer)
 {
     FILE* stream;
     char filename [65] = "/tmp/group2/data/station/145-510002-";
@@ -113,10 +164,10 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     sprintf(curtime,"%010ld",seconds);
     strcat(filename,curtime);
     char* line = "-";
-    strcat(filename,line);  
+    strcat(filename,line);
     char str[6];
     sprintf(str,"%05d",sta_records_count);
-    strcat(filename,str); 
+    strcat(filename,str);
     char* back = "-WA_SOURCE_FJ_1001-0.xml";
     strcat(filename,back);
     if (fopen(filename, "w")) {
@@ -151,7 +202,7 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     }
     /*print
     printf("-----------sta-------%d----------------------\n", sta_count);
-    printf(" MAC:%s\n rssi:%d recieved time:%s\n", sta_pointer->mac, sta_pointer->rssi, 
+    printf(" MAC:%s\n rssi:%d recieved time:%s\n", sta_pointer->mac, sta_pointer->rssi,
         sta_pointer->recieved_time);
 */
 

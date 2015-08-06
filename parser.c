@@ -6,8 +6,7 @@ struct raw_sta_xml_data raw_sta;
 
 long globalSecond;
 
-void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet)
-{
+void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     long seconds = time((time_t*)NULL);
     // upload interval is 30s
     if (seconds - globalSecond > 5) {
@@ -33,23 +32,22 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     } else if (fillStaData(rHeader, packet, &raw_sta, pkthdr)) {
         save_sta(&raw_sta);
     }
-    
 }
 
 int myPcapCatchAndAnaly()
 {
     int status=0;
-    int header_type; 
+    int header_type;
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* linux */
     //char *dev=(char *)"wlan0";
-    
+
     /* macbook pro */
     char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
-    
+
     if (handle == NULL)  {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         return 0;
@@ -57,8 +55,8 @@ int myPcapCatchAndAnaly()
     else {
         printf("Opened device %s\n",dev);
     }
-    
-    // if(pcap_can_set_rfmon(handle)) {    
+
+    // if(pcap_can_set_rfmon(handle)) {
     //      //查看是否能设置为监控模式
     //     //printf("Device %s can be opened in monitor mode\n",dev);
     // }
@@ -66,10 +64,10 @@ int myPcapCatchAndAnaly()
     //     //printf("Device %s can't be opened in monitor mode!!!\n",dev);
     // }
 
-    
+
     pcap_set_rfmon(handle,0);   //设置为监控模式
-     
-    if(pcap_set_rfmon(handle,1)!=0) { 
+
+    if(pcap_set_rfmon(handle,1)!=0) {
         fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
         return 0;
     }
@@ -83,18 +81,18 @@ int myPcapCatchAndAnaly()
         pcap_perror(handle,(char*)"pcap error: ");
         return 0;
     }
-        
+
     header_type=pcap_datalink(handle);  //返回链路层的类型
     if(header_type!=DLT_IEEE802_11_RADIO) {
         //printf("Error: incorrect header type - %d",header_type);
-        return 0;            
+        return 0;
     }
-     
+
     int id = 0;
     globalSecond = time((time_t*)NULL);
     /* wait loop until PACKET_NUMBER */
     pcap_loop(handle, -1, getPacket, (u_char*)&id);
-  
+
     pcap_close(handle);
     return 0;
 }
@@ -117,6 +115,7 @@ int main()
     remove_dir("/tmp/group2/data/station");
     remove_dir("/tmp/group2/zip");
 
+    writeIndex();
     myPcapCatchAndAnaly();
     return 0;
 }

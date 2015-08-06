@@ -11,5 +11,3 @@
 #include <curl/curl.h>
 
 void upload( const char * zipname);
-
-// -lcurl

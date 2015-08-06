@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MESSAGE>
-    <DATASET name="WA_COMMON_010017" ver="1.0" rmk="数据文件索引信息">
-        <DATA>
-            <DATASET name="WA_COMMON_010013" rmk="BCP文件描述信息">
-                <DATA>
-                    <ITEM key="I010032" val="" rmk="列分隔符（缺少值时默认为换行符\t）"/>
-                    <ITEM key="I010033" val="" rmk="行分隔符（缺少值时默认为换行符\n）"/>
-                    <ITEM key="A010004" val="WA_SOURCE_FJ_1001" rmk="数据集代码"/>
-                    <ITEM key="B050016" val="145" rmk="数据来源"/>
-                    <ITEM key="G020013" val="xxxxxx" rmk="网安专用产品厂家组织机构代码"/>
-                    <ITEM key="E010008" val="510002" rmk="数据采集地"/>
-                    <!-- 描述BCP文件中的数据列顺序 -->
-                    <DATASET name="WA_COMMON_010015" rmk="BCP文件数据结构">
-                        <DATA>
-                            <ITEM key="C040002" eng="MAC" chn="终端MAC地址"/>
-                            <ITEM key="H010014" eng="CAPTURE_TIME" chn="采集时间"/>
-                            <ITEM key="I070003" eng="TERMINAL_FIELD STRENGTH" chn="被采终端场强"/>
-                        </DATA>
-                    </DATASET>
-                </DATA>
-                <DATA>
-                    <ITEM key="I010032" val="" rmk="列分隔符（缺少值时默认为换行符\t）"/>
-                    <ITEM key="I010033" val="" rmk="行分隔符（缺少值时默认为换行符\n）"/>
-                    <ITEM key="A010004" val="WA_SOURCE_FJ_1002" rmk="数据集代码"/>
-                    <ITEM key="B050016" val="145" rmk="数据来源"/>
-                    <ITEM key="G020013" val="xxxxxx" rmk="网安专用产品厂家组织机构代码"/>
-                    <ITEM key="E010008" val="510002" rmk="数据采集地"/>
-                    <!-- 描述BCP文件中的数据列顺序 -->
-                    <DATASET name="WA_COMMON_010015" rmk="BCP文件数据结构">
-                        <DATA>
-                            <ITEM key="F030011" eng="AP_MAC" chn="热点MAC地址"/>
-                            <ITEM key="F030001" eng="AP_SSID" chn="热点SSID"/>
-                            <ITEM key="F030022" eng="AP_CHANNEL" chn="热点频道"/>
-                            <ITEM key="B040025" eng="mixed WPA/WPA2CCMP" chn="热点加密类型"/>
-                            <ITEM key="H010014" eng="CAPTURE_TIME" chn="采集时间"/>
-                            <ITEM key="F030023" eng="AP_FIELD STRENGTH" chn="热点场强"/>
-                        </DATA>
-                    </DATASET>
-                </DATA>
-                <!-- 多种不同结构的文件可以使用多条记录描述 -->
-            </DATASET>
-        </DATA>
-    </DATASET>
+	<DATASET name="WA_COMMON_010017" ver="1.0" rmk="数据文件索引信息">
+		<DATA>
+			<DATASET name="WA_COMMON_010013" rmk="BCP文件描述信息">
+				<DATA>
+					<ITEM key="I010032" val="" rmk="列分隔符（缺少值时默认为换行符\t）"/>
+					<ITEM key="I010033" val="" rmk="行分隔符（缺少值时默认为换行符\n）"/>
+					<ITEM key="A010004" val="WA_SOURCE_FJ_1001" rmk="数据集代码"/>
+					<ITEM key="B050016" val="145" rmk="数据来源"/>
+					<ITEM key="G020013" val="xxxxxx" rmk="网安专用产品厂家组织机构代码"/>
+					<ITEM key="E010008" val="510002" rmk="数据采集地"/>
+					<!-- 描述BCP文件中的数据列顺序 -->
+					<DATASET name="WA_COMMON_010015" rmk="BCP文件数据结构">
+						<DATA>
+							<ITEM key="C040002" eng="MAC" chn="终端MAC地址"/>
+							<ITEM key="H010014" eng="CAPTURE_TIME" chn="采集时间"/>
+							<ITEM key="I070003" eng="TERMINAL_FIELD STRENGTH" chn="被采终端场强"/>
+						</DATA>
+					</DATASET>
+				</DATA>
+				<DATA>
+					<ITEM key="I010032" val="" rmk="列分隔符（缺少值时默认为换行符\t）"/>
+					<ITEM key="I010033" val="" rmk="行分隔符（缺少值时默认为换行符\n）"/>
+					<ITEM key="A010004" val="WA_SOURCE_FJ_1002" rmk="数据集代码"/>
+					<ITEM key="B050016" val="145" rmk="数据来源"/>
+					<ITEM key="G020013" val="xxxxxx" rmk="网安专用产品厂家组织机构代码"/>
+					<ITEM key="E010008" val="510002" rmk="数据采集地"/>
+					<!-- 描述BCP文件中的数据列顺序 -->
+					<DATASET name="WA_COMMON_010015" rmk="BCP文件数据结构">
+						<DATA>
+							<ITEM key="F030011" eng="AP_MAC" chn="热点MAC地址"/>
+							<ITEM key="F030001" eng="AP_SSID" chn="热点SSID"/>
+							<ITEM key="F030022" eng="AP_CHANNEL" chn="热点频道"/>
+							<ITEM key="B040025" eng="mixed WPA/WPA2CCMP" chn="热点加密类型"/>
+							<ITEM key="H010014" eng="CAPTURE_TIME" chn="采集时间"/>
+							<ITEM key="F030023" eng="AP_FIELD STRENGTH" chn="热点场强"/>
+						</DATA>
+					</DATASET>
+				</DATA>
+				<!-- 多种不同结构的文件可以使用多条记录描述 -->
+			</DATASET>
+		</DATA>
+	</DATASET>
 </MESSAGE>

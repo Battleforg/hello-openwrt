@@ -5,7 +5,14 @@
 //write GAB_ZIP_INDEX.xml
 void writeIndex() {
     FILE* stream;
-    char filename[] = "GAB_ZIP_INDEX.xml";
+    // char filename[] = "/tmp/group2/data/GAB_ZIP_INDEX.xml";
+    //test
+    char filename[] = "data/GAB_ZIP_INDEX.xml";
+    //if the index file exists
+    if (fopen(filename, "r")) {
+        return ;
+    }
+
     if (fopen(filename, "w")) {
         stream = fopen(filename, "w");
         fprintf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -86,7 +93,9 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
 {
     FILE* stream;
-    char filename [65] = "/tmp/group2/data/hotspot/145-510002-";
+    // char filename [70] = "/tmp/group2/data/hotspot/145-510002-";
+    // test
+    char filename [70] = "data/hotspot/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -123,9 +132,10 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     } else {
         printf("fail to save xml!\n");
     }
-    printf("------hotspot------------%d----------------------\n", hotspot_records_count);
-    printf("SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
-        hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
+    // printf("------hotspot------------%d----------------------\n", hotspot_records_count);
+    // printf(" SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
+    //     hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
+
 }
 
 
@@ -158,7 +168,10 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
 void save_sta(struct raw_sta_xml_data* sta_pointer)
 {
     FILE* stream;
-    char filename [65] = "/tmp/group2/data/station/145-510002-";
+
+    // char filename [70] = "/tmp/group2/data/station/145-510002-";
+    // test
+    char filename [70] = "data/station/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -200,11 +213,11 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     } else {
         printf("fail to save xml!\n");
     }
-    /*print
-    printf("-----------sta-------%d----------------------\n", sta_count);
-    printf(" MAC:%s\n rssi:%d recieved time:%s\n", sta_pointer->mac, sta_pointer->rssi,
-        sta_pointer->recieved_time);
-*/
+
+    // printf("-----------sta-------%d----------------------\n", sta_records_count);
+    // printf(" MAC:%s\n rssi:%d recieved time:%s\n", sta_pointer->mac, sta_pointer->rssi,
+    //     sta_pointer->recieved_time);
+
 
 }
 
@@ -214,15 +227,14 @@ void refreshAndUpload()
 {
     // clear known station and hotspot
     int i;
-    for (i = 0; i < hotspot_records_count; ++i)
-    {
+    for (i = 0; i < hotspot_records_count; ++i) {
         memset(knownHotspotMAC[i], 0, sizeof(knownHotspotMAC[i]));
     }
-    hotspot_records_count = 0;
-    for (i = 0; i < sta_records_count; ++i)
-    {
+
+    for (i = 0; i < sta_records_count; ++i) {
         memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
     }
+    hotspot_records_count = 0;
     sta_records_count = 0;
 
 //test
@@ -233,6 +245,7 @@ void refreshAndUpload()
     remove_dir("data/hotspot");
     remove_dir("data/station");
     remove_dir("zip");
+
 //openwrt
 
     // system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
@@ -240,6 +253,4 @@ void refreshAndUpload()
     // remove_dir("/tmp/group2/data/hotspot");
     // remove_dir("/tmp/group2/data/station");
     // remove_dir("/tmp/group2/zip");
-
-    printf("!!!\n");
 }

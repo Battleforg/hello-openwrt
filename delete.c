@@ -33,7 +33,7 @@ void remove_dir(const char *path_raw) {
         fprintf(stderr, "not a dir or access error\n");
         return;
     }
-    printf("path_raw : %s\n", path_raw);
+    //printf("path_raw : %s\n", path_raw);
     dfs_remove_dir();
     chdir(old_path);
 }

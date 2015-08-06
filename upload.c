@@ -1,6 +1,6 @@
 #include "upload.h"
 
-void upload( const char * zipname){
+void upload(const char * zipname){
     CURL *curl;
     CURLcode res;
     FILE *in;

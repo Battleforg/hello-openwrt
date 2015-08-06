@@ -1,9 +1,6 @@
 #include "listener.h"
 #include "saveXML.h"
 #include "delete.h"
-#include "upload.h"
-#include <sys/stat.h> 
-#include <unistd.h>
 
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
@@ -38,16 +35,16 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     }
 }
 
-int myPcapCatchAndAnaly()
-{
+int myPcapCatchAndAnaly() {
     int status=0;
     int header_type;
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
-    /* linux */
+    /* openwrt && linux */
     //char *dev=(char *)"wlan0";
 
-    /* macbook pro */
+    /* mac os */
+    //test
     char* dev=(char *)"en0";
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
@@ -60,6 +57,9 @@ int myPcapCatchAndAnaly()
         printf("Opened device %s\n",dev);
     }
 
+    // 由于在该路由器测试时，发现在该openwrt系统上不支持libpcap设置monitor模式，在激活的时候会产生错误
+    // 将采用手动设置并检测网卡是否为monitor模式
+
     // if(pcap_can_set_rfmon(handle)) {
     //      //查看是否能设置为监控模式
     //     //printf("Device %s can be opened in monitor mode\n",dev);
@@ -68,19 +68,18 @@ int myPcapCatchAndAnaly()
     //     //printf("Device %s can't be opened in monitor mode!!!\n",dev);
     // }
 
-
-    pcap_set_rfmon(handle,0);   //设置为监控模式
-
+    // 若是mac os系统，则可以支持
+    // test
     if(pcap_set_rfmon(handle,1)!=0) {
         fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
         return 0;
-    }
-    else {
+    } else {
         printf("Device %s has been opened in monitor mode\n", dev);
     }
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
     status=pcap_activate(handle);   //激活
+
     if(status!=0) {
         pcap_perror(handle,(char*)"pcap error: ");
         return 0;
@@ -88,42 +87,45 @@ int myPcapCatchAndAnaly()
 
     header_type=pcap_datalink(handle);  //返回链路层的类型
     if(header_type!=DLT_IEEE802_11_RADIO) {
-        //printf("Error: incorrect header type - %d",header_type);
+        printf("Error: incorrect header type - %d",header_type);
         return 0;
     }
 
     int id = 0;
     globalSecond = time((time_t*)NULL);
-    /* wait loop until PACKET_NUMBER */
+    //loop
+    printf("Get Packets Start!\n");
     pcap_loop(handle, -1, getPacket, (u_char*)&id);
-
     pcap_close(handle);
     return 0;
 }
- 
-void foldercrate( const char * foldername){
+
+void folder_create( const char * foldername){
     if(access(foldername,F_OK) != 0){
         mkdir(foldername,0777);
     }
 }
 
+int main() {
+    //openwrt
+    // folder_create("/tmp/group2");
+    // folder_create("/tmp/group2/data");
+    // folder_create("/tmp/group2/data/hotspot");
+    // folder_create("/tmp/group2/data/station");
+    // folder_create("/tmp/group2/zip");
+    // remove_dir("/tmp/group2/data/hotspot");
+    // remove_dir("/tmp/group2/data/station");
+    // remove_dir("/tmp/group2/zip");
 
-int main()
-{
-     // system("mkdir -m 777 data");
-     // system("cp GAB_ZIP_INDEX.xml data");
-     // system("mkdir -m 777  data/hotspot");
-     // system("mkdir -m 777  data/station");
-     // system("mkdir -m 777  zip");
-
-    foldercrate("/tmp/group2/data");
-    foldercrate("/tmp/group2/data/hotspot");
-    foldercrate("/tmp/group2/data/station");
-    foldercrate("/tmp/group2/zip");
-    remove_dir("/tmp/group2/data/hotspot");
-    remove_dir("/tmp/group2/data/station");
-    remove_dir("/tmp/group2/zip");
-
+    //test
+    folder_create("data");
+    folder_create("data/hotspot");
+    folder_create("data/station");
+    folder_create("zip");
+    remove_dir("data/hotspot");
+    remove_dir("data/station");
+    remove_dir("zip");
+    //write the index file for zip file
     writeIndex();
     myPcapCatchAndAnaly();
     return 0;

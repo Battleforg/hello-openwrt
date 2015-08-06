@@ -173,21 +173,23 @@ void refreshAndUpload()
         memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
     }
     sta_records_count = 0;
-
+//mac
     // compress and upload
-    // system("zip -r -q zip/data.zip data");
-    // upload("zip/data.zip");
+    system("zip -r -q zip/data.zip data");
+    upload("zip/data.zip");
 
+    //delete all old file
+    remove_dir("data/hotspot");
+    remove_dir("data/station");
+    remove_dir("zip");
+//openwrt
+/*
     system("zip -r -q /tmp/group2/zip/data.zip data");
     upload("/tmp/group2/zip/data.zip");
-
-    // delete all old file
-    // remove_dir("data/hotspot");
-    // remove_dir("data/station");
-    // remove_dir("zip");
 
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
     remove_dir("/tmp/group2/zip");
+  */
     printf("!!!\n");
 }

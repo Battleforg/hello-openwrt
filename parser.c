@@ -57,17 +57,18 @@ int myPcapCatchAndAnaly()
     else {
         printf("Opened device %s\n",dev);
     }
-    /*
-    if(pcap_can_set_rfmon(handle)) {    
-         //查看是否能设置为监控模式
-        //printf("Device %s can be opened in monitor mode\n",dev);
-    }
-    else {
-        //printf("Device %s can't be opened in monitor mode!!!\n",dev);
-    }
-    */ 
-    //pcap_set_rfmon(handle,0);   //设置为监控模式
-    /* 
+    
+    // if(pcap_can_set_rfmon(handle)) {    
+    //      //查看是否能设置为监控模式
+    //     //printf("Device %s can be opened in monitor mode\n",dev);
+    // }
+    // else {
+    //     //printf("Device %s can't be opened in monitor mode!!!\n",dev);
+    // }
+
+    
+    pcap_set_rfmon(handle,0);   //设置为监控模式
+     
     if(pcap_set_rfmon(handle,1)!=0) { 
         fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
         return 0;
@@ -77,7 +78,6 @@ int myPcapCatchAndAnaly()
     }
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
-    */    
     status=pcap_activate(handle);   //激活
     if(status!=0) {
         pcap_perror(handle,(char*)"pcap error: ");
@@ -99,20 +99,24 @@ int myPcapCatchAndAnaly()
     return 0;
 }
 
-int main() {
-    system("mkdir -m 777 data");
-    system("cp GAB_ZIP_INDEX.xml data");
-    system("mkdir -m 777  data/hotspot");
-    system("mkdir -m 777  data/station");
-    system("mkdir -m 777  zip");
-//openwrt
-/*
-    system("mkdir -m 777 /tmp/group2/data");
-    system("cp GAB_ZIP_INDEX.xml /tmp/group2/data");
-    system("mkdir -m 777  /tmp/group2/data/hotspot");
-    system("mkdir -m 777  /tmp/group2/data/station");xx
-    system("mkdir -m 777  /tmp/group2/zip");
-*/
+
+int main()
+{
+     // system("mkdir -m 777 data");
+     // system("cp GAB_ZIP_INDEX.xml data");
+     // system("mkdir -m 777  data/hotspot");
+     // system("mkdir -m 777  data/station");
+     // system("mkdir -m 777  zip");
+
+     // system("mkdir -m 777 /tmp/group2/data");
+     // system("cp GAB_ZIP_INDEX.xml /tmp/group2/data");
+     // system("mkdir -m 777  /tmp/group2/data/hotspot");
+     // system("mkdir -m 777  /tmp/group2/data/station");
+     // system("mkdir -m 777  /tmp/group2/zip");
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
+
     myPcapCatchAndAnaly();
     return 0;
 }

@@ -1,11 +1,11 @@
 OBJS = parser.o listener.o saveXML.o upload.o delete.o 
 CC = gcc
 CFLAGS = -Wall -g
-INCLUDE = -I/usr/local/include -I/usr/local/lib/libzip/include
+INCLUDE = -I/usr/local/include 
 LDFLAGS = -L/usr/local/lib
 
 listener : $(OBJS)
-	$(CC) $(OBJS) -o listener $(INCLUDE) $(CFLAGS) $(LDFLAGS) -lpcap -lcurl -lzip
+	$(CC) $(OBJS) -o listener $(INCLUDE) $(CFLAGS) $(LDFLAGS) -lpcap -lcurl
 listener.o : listener.c listener.h
 	$(CC) $(CFLAGS) -c listener.c -o listener.o
 parser.o : parser.c listener.h

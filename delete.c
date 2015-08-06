@@ -56,7 +56,7 @@ void remove_dir(const char *path_raw)
     chdir(old_path);
 
     
-       // 如果你想删除该目录本身的话,取消注释
+    // 如果你想删除该目录本身的话,取消注释
     // unlink(old_path); 
      
 }

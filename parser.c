@@ -2,7 +2,7 @@
 #include "saveXML.h"
 #include "delete.h"
 
-#define GAP 5
+int GAP = 30;
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
 

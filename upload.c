@@ -1,22 +1,21 @@
 #include "upload.h"
 
 void seturls(){
-    memset(urls,2,100*sizeof(char));
-    urls="\0";
+    strcpy(urls,"");
     char url[50],usern[20],filen[30];
 
     printf("Please input url:");
-    scanf("%s",&url);
+    scanf("%s",url);
     strcat(urls,url);
 
     strcat(urls,"?user=");
     printf("Please input username:");
-    scanf("%s",&usern);
+    scanf("%s",usern);
     strcat(urls,usern);
 
     strcat(urls,"&filename=");
     printf("Please input filename:");
-    scanf("%s",&filen);
+    scanf("%s",filen);
     strcat(urls,filen);
 
     printf("%s\n",urls );

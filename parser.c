@@ -109,9 +109,10 @@ void folder_create( const char * foldername){
 }
 
 int main() {
-    strcat(urls,"http://jxuao.me/upload?user=group2&filename=data.zip");
-
     int comd;
+    const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
+    strcpy(urls,origin);
+
     printf("Please input a number:\n");
     printf("1.run!\n");
     printf("2.set upload information\n");

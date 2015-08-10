@@ -1,5 +1,27 @@
 #include "upload.h"
 
+void seturls(){
+    //memset(urls,0,sizeof(urls));
+    strcpy(urls,"");
+    char url[50],usern[20],filen[30];
+
+    printf("Please input url:");
+    scanf("%s",url);
+    strcat(urls,url);
+
+    strcat(urls,"?user=");
+    printf("Please input username:");
+    scanf("%s",usern);
+    strcat(urls,usern);
+
+    strcat(urls,"&filename=");
+    printf("Please input filename:");
+    scanf("%s",filen);
+    strcat(urls,filen);
+
+    printf("%s\n",urls );
+}
+
 void upload(const char * zipname){
     CURL *curl;
     CURLcode res;
@@ -25,7 +47,11 @@ void upload(const char * zipname){
       /* First set the URL that is about to receive our POST. This URL can
            just as well be a https:// URL if that is what should receive the
            data. */
-      curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=group2&filename=data.zip");
+// <<<<<<< HEAD
+//       curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=group2&filename=data.zip");
+// =======
+      curl_easy_setopt(curl, CURLOPT_URL,urls);
+
       /* Now specify the POST data */
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS,data);
 

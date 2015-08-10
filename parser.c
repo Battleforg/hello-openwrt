@@ -1,8 +1,11 @@
-#include "listener.h"
+// #include "listener.h"
 #include "saveXML.h"
 #include "delete.h"
+#include "upload.h"
+
 
 int GAP = 30;
+
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
 
@@ -42,11 +45,13 @@ int myPcapCatchAndAnaly() {
     pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* openwrt && linux */
+
     //char *dev=(char *)"wlan0";
 
     /* mac os */
     //test
     char* dev=(char *)"en0";
+
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
 
@@ -60,6 +65,7 @@ int myPcapCatchAndAnaly() {
 
     // 由于在该路由器测试时，发现在该openwrt系统上不支持libpcap设置monitor模式，在激活的时候会产生错误
     // 将采用手动设置并检测网卡是否为monitor模式
+
 
     // if(pcap_can_set_rfmon(handle)) {
     //      //查看是否能设置为监控模式
@@ -77,6 +83,7 @@ int myPcapCatchAndAnaly() {
     } else {
         printf("Device %s has been opened in monitor mode\n", dev);
     }
+
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
     status=pcap_activate(handle);   //激活
@@ -108,6 +115,26 @@ void folder_create( const char * foldername){
 }
 
 int main() {
+    int comd;
+    printf("Please input a number:\n");
+    printf("1.run!\n");
+    printf("2.set upload information\n");
+
+    const char* origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
+    strcpy(urls, origin);
+    while(scanf("%d",&comd) == 1){
+        switch(comd){
+            case 1:
+                    writeIndex();
+                    myPcapCatchAndAnaly();
+                    break;
+            case 2:
+                    seturls();
+                    break;
+            default:
+                    break;
+        }
+    }
     //openwrt
     // folder_create("/tmp/group2");
     // folder_create("/tmp/group2/data");
@@ -127,7 +154,6 @@ int main() {
     remove_dir("data/station");
     remove_dir("zip");
     //write the index file for zip file
-    writeIndex();
-    myPcapCatchAndAnaly();
+
     return 0;
 }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <string.h>
 
 /* somewhat unix-specific */
 #include <sys/time.h>
@@ -9,5 +10,10 @@
 
 /* curl stuff */
 #include <curl/curl.h>
+
+
+char urls[90];
+
+void seturls();
 
 void upload( const char * zipname);

@@ -5,9 +5,11 @@
 //write GAB_ZIP_INDEX.xml
 void writeIndex() {
     FILE* stream;
+
     // char filename[] = "/tmp/group2/data/GAB_ZIP_INDEX.xml";
     //test
     char filename[] = "data/GAB_ZIP_INDEX.xml";
+
     //if the index file exists
     if (fopen(filename, "r")) {
         return ;
@@ -93,9 +95,11 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
 {
     FILE* stream;
-    // char filename [70] = "/tmp/group2/data/hotspot/145-510002-";
+
+    // char filename[70] = "/tmp/group2/data/hotspot/145-510002-";
     // test
-    char filename [70] = "data/hotspot/145-510002-";
+    char filename[70] = "data/hotspot/145-510002-";
+
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -172,6 +176,7 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     // char filename [70] = "/tmp/group2/data/station/145-510002-";
     // test
     char filename [70] = "data/station/145-510002-";
+
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -238,6 +243,7 @@ void refreshAndUpload()
     sta_records_count = 0;
 
 //test
+
     // compress and upload
     system("zip -r -q zip/data.zip data");
     upload("zip/data.zip");
@@ -253,4 +259,5 @@ void refreshAndUpload()
     // remove_dir("/tmp/group2/data/hotspot");
     // remove_dir("/tmp/group2/data/station");
     // remove_dir("/tmp/group2/zip");
+
 }

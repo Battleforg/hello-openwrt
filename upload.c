@@ -1,7 +1,7 @@
 #include "upload.h"
 
 void seturls(){
-    //memset(urls,0,sizeof(urls));
+
     strcpy(urls,"");
     char url[50],usern[20],filen[30];
 
@@ -47,6 +47,7 @@ void upload(const char * zipname){
       /* First set the URL that is about to receive our POST. This URL can
            just as well be a https:// URL if that is what should receive the
            data. */
+
 // <<<<<<< HEAD
 //       curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=group2&filename=data.zip");
 // =======

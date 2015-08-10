@@ -3,9 +3,7 @@
 #include "delete.h"
 #include "upload.h"
 
-
-int GAP = 30;
-
+int GAP =  5;
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
 
@@ -46,11 +44,11 @@ int myPcapCatchAndAnaly() {
     char errbuf[PCAP_ERRBUF_SIZE];
     /* openwrt && linux */
 
-    //char *dev=(char *)"wlan0";
+    char *dev=(char *)"wlan0";
 
     /* mac os */
     //test
-    char* dev=(char *)"en0";
+    // char* dev=(char *)"en0";
 
 
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
@@ -66,23 +64,22 @@ int myPcapCatchAndAnaly() {
     // 由于在该路由器测试时，发现在该openwrt系统上不支持libpcap设置monitor模式，在激活的时候会产生错误
     // 将采用手动设置并检测网卡是否为monitor模式
 
-
     // if(pcap_can_set_rfmon(handle)) {
     //      //查看是否能设置为监控模式
-    //     //printf("Device %s can be opened in monitor mode\n",dev);
+    //     printf("Device %s can be opened in monitor mode\n",dev);
     // }
     // else {
-    //     //printf("Device %s can't be opened in monitor mode!!!\n",dev);
+    //     printf("Device %s can't be opened in monitor mode!!!\n",dev);
     // }
 
     // 若是mac os系统，则可以支持
     // test
-    if(pcap_set_rfmon(handle,1)!=0) {
-        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-        return 0;
-    } else {
-        printf("Device %s has been opened in monitor mode\n", dev);
-    }
+    // if(pcap_set_rfmon(handle,1)!=0) {
+    //     fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+    //     return 0;
+    // } else {
+    //     printf("Device %s has been opened in monitor mode\n", dev);
+    // }
 
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
@@ -116,12 +113,13 @@ void folder_create( const char * foldername){
 
 int main() {
     int comd;
+    const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
+    strcpy(urls,origin);
+
     printf("Please input a number:\n");
     printf("1.run!\n");
     printf("2.set upload information\n");
 
-    const char* origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
-    strcpy(urls, origin);
     while(scanf("%d",&comd) == 1){
         switch(comd){
             case 1:
@@ -135,24 +133,25 @@ int main() {
                     break;
         }
     }
+
     //openwrt
-    // folder_create("/tmp/group2");
-    // folder_create("/tmp/group2/data");
-    // folder_create("/tmp/group2/data/hotspot");
-    // folder_create("/tmp/group2/data/station");
-    // folder_create("/tmp/group2/zip");
-    // remove_dir("/tmp/group2/data/hotspot");
-    // remove_dir("/tmp/group2/data/station");
-    // remove_dir("/tmp/group2/zip");
+    folder_create("/tmp/group2");
+    folder_create("/tmp/group2/data");
+    folder_create("/tmp/group2/data/hotspot");
+    folder_create("/tmp/group2/data/station");
+    folder_create("/tmp/group2/zip");
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
 
     //test
-    folder_create("data");
-    folder_create("data/hotspot");
-    folder_create("data/station");
-    folder_create("zip");
-    remove_dir("data/hotspot");
-    remove_dir("data/station");
-    remove_dir("zip");
+    // folder_create("data");
+    // folder_create("data/hotspot");
+    // folder_create("data/station");
+    // folder_create("zip");
+    // remove_dir("data/hotspot");
+    // remove_dir("data/station");
+    // remove_dir("zip");
     //write the index file for zip file
 
     return 0;

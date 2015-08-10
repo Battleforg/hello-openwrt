@@ -11,9 +11,9 @@
 /* curl stuff */
 #include <curl/curl.h>
 
-
 char urls[90];
 
 void seturls();
+
 
 void upload( const char * zipname);

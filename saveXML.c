@@ -6,9 +6,9 @@
 void writeIndex() {
     FILE* stream;
 
-    // char filename[] = "/tmp/group2/data/GAB_ZIP_INDEX.xml";
+    char filename[] = "/tmp/group2/data/GAB_ZIP_INDEX.xml";
     //test
-    char filename[] = "data/GAB_ZIP_INDEX.xml";
+    //char filename[] = "data/GAB_ZIP_INDEX.xml";
 
     //if the index file exists
     if (fopen(filename, "r")) {
@@ -173,9 +173,10 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
 {
     FILE* stream;
 
-    // char filename [70] = "/tmp/group2/data/station/145-510002-";
+
+    char filename [70] = "/tmp/group2/data/station/145-510002-";
     // test
-    char filename [70] = "data/station/145-510002-";
+    // char filename [70] = "data/station/145-510002-";
 
     long seconds = time((time_t*)NULL);
     char curtime[11];
@@ -228,8 +229,7 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
 
 
 // refresh known data of station and hotspot
-void refreshAndUpload()
-{
+void refreshAndUpload() {
     // clear known station and hotspot
     int i;
     for (i = 0; i < hotspot_records_count; ++i) {
@@ -244,20 +244,20 @@ void refreshAndUpload()
 
 //test
 
-    // compress and upload
-    system("zip -r -q zip/data.zip data");
-    upload("zip/data.zip");
-    //delete all old file
-    remove_dir("data/hotspot");
-    remove_dir("data/station");
-    remove_dir("zip");
+    // // compress and upload
+    // system("zip -r -q zip/data.zip data");
+    // upload("zip/data.zip");
+    // //delete all old file
+    // remove_dir("data/hotspot");
+    // remove_dir("data/station");
+    // remove_dir("zip");
 
 //openwrt
 
-    // system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
-    // upload("/tmp/group2/zip/data.zip");
-    // remove_dir("/tmp/group2/data/hotspot");
-    // remove_dir("/tmp/group2/data/station");
-    // remove_dir("/tmp/group2/zip");
+    system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
+    upload("/tmp/group2/zip/data.zip");
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
 
 }

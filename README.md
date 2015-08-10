@@ -7,6 +7,7 @@ First OpenWrt project
 
 
 扩展：
+多线程
 按照信号强度将wifi热点进行排序
 
 

@@ -256,14 +256,14 @@ void refreshAndUpload() {
     // //delete all old file
     // remove_dir("data/hotspot");
     // remove_dir("data/station");
-    // remove_dir("zip");
 
 //openwrt
 
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
-    upload("/tmp/group2/zip/data.zip");
+    zip_num++;
+    // upload("/tmp/group2/zip/data.zip");
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
-    remove_dir("/tmp/group2/zip");
 
+    // remove_dir("/tmp/group2/zip");
 }

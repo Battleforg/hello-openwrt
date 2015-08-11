@@ -1,14 +1,3 @@
-// #include "listener.h"
-#include "saveXML.h"
-#include "delete.h"
-#include "upload.h"
-
-int GAP =  5;
-struct raw_hotspot_xml_data raw;
-struct raw_sta_xml_data raw_sta;
-
-long globalSecond;
-
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     long seconds = time((time_t*)NULL);
     // upload interval is 30s
@@ -109,50 +98,6 @@ void folder_create( const char * foldername){
     if(access(foldername,F_OK) != 0){
         mkdir(foldername,0777);
     }
+
 }
 
-int main() {
-    int comd;
-    const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
-    strcpy(urls,origin);
-
-    printf("Please input a number:\n");
-    printf("1.run!\n");
-    printf("2.set upload information\n");
-
-    while(scanf("%d",&comd) == 1){
-        switch(comd){
-            case 1:
-                    writeIndex();
-                    myPcapCatchAndAnaly();
-                    break;
-            case 2:
-                    seturls();
-                    break;
-            default:
-                    break;
-        }
-    }
-
-    //openwrt
-    folder_create("/tmp/group2");
-    folder_create("/tmp/group2/data");
-    folder_create("/tmp/group2/data/hotspot");
-    folder_create("/tmp/group2/data/station");
-    folder_create("/tmp/group2/zip");
-    remove_dir("/tmp/group2/data/hotspot");
-    remove_dir("/tmp/group2/data/station");
-    remove_dir("/tmp/group2/zip");
-
-    //test
-    // folder_create("data");
-    // folder_create("data/hotspot");
-    // folder_create("data/station");
-    // folder_create("zip");
-    // remove_dir("data/hotspot");
-    // remove_dir("data/station");
-    // remove_dir("zip");
-    //write the index file for zip file
-
-    return 0;
-}

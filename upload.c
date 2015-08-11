@@ -22,7 +22,7 @@ void seturls(){
     printf("%s\n",urls );
 }
 
-void upload(const char * zipname){
+int upload(const char * zipname){
     CURL *curl;
     CURLcode res;
     FILE *in;
@@ -65,8 +65,10 @@ void upload(const char * zipname){
       /* Perform the request, res will get the return code */
       res = curl_easy_perform(curl);
       /* Check for errors */
-      if(res != CURLE_OK)
+      if(res != CURLE_OK){
           fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+          return -1;
+        }
 
       /* always cleanup */
       curl_easy_cleanup(curl);
@@ -76,5 +78,6 @@ void upload(const char * zipname){
 
     }
     curl_global_cleanup();
+    return 0;
 }
 

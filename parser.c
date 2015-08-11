@@ -1,12 +1,5 @@
 #include "parser.h"
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
-    long seconds = time((time_t*)NULL);
-    // upload interval is 30s
-    if (seconds - globalSecond > GAP) {
-        refreshAndUpload();
-        globalSecond = seconds;
-        return;
-    }
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
     // calculate radiotap header length
     int l1= rHeader->len[1];
@@ -86,18 +79,10 @@ int myPcapCatchAndAnaly() {
     }
 
     int id = 0;
-    globalSecond = time((time_t*)NULL);
     //loop
     printf("Get Packets Start!\n");
     pcap_loop(handle, -1, getPacket, (u_char*)&id);
     pcap_close(handle);
     return 0;
-}
-
-void folder_create( const char * foldername){
-    if(access(foldername,F_OK) != 0){
-        mkdir(foldername,0777);
-    }
-
 }
 

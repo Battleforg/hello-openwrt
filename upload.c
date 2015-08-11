@@ -65,7 +65,7 @@ int upload(const char * zipname){
       if(res != CURLE_OK){
           fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
           return -1;
-        }
+      }
 
       /* always cleanup */
       curl_easy_cleanup(curl);

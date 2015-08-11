@@ -1,12 +1,9 @@
 #include "saveXML.h"
-#include "upload.h"
-#include "delete.h"
 
 //write GAB_ZIP_INDEX.xml
 void writeIndex() {
     FILE* stream;
     char filename[] = "/tmp/group2/data/GAB_ZIP_INDEX.xml";
-
     //if the index file exists
     if (fopen(filename, "r")) {
         return ;
@@ -133,9 +130,7 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
     // printf("------hotspot------------%d----------------------\n", hotspot_records_count);
     // printf(" SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
     //     hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
-
 }
-
 
 // record MAC addresses of know station
 char knownStaMAC[PACKET_NUMBER][20];
@@ -163,8 +158,7 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
     return 1;
 }
 
-void save_sta(struct raw_sta_xml_data* sta_pointer)
-{
+void save_sta(struct raw_sta_xml_data* sta_pointer) {
     FILE* stream;
     char filename [80] = "/tmp/group2/data/station/145-510002-";
 
@@ -215,9 +209,8 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     //     sta_pointer->recieved_time);
 }
 
-
 // refresh known data of station and hotspot
-void refreshAndUpload() {
+void refreshAndZip() {
     // clear known station and hotspot
     int i;
     for (i = 0; i < hotspot_records_count; ++i) {
@@ -235,12 +228,7 @@ void refreshAndUpload() {
  * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
  * -q 不显示指令执行过程。
 **/
-
-
-//openwrt
-
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
-
 }

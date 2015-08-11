@@ -1,6 +1,7 @@
 #include "upload.h"
 
 void seturls(){
+
     strcpy(urls,"");
     char url[50],usern[20],filen[30];
 
@@ -21,7 +22,7 @@ void seturls(){
     printf("%s\n",urls );
 }
 
-void upload(const char * zipname){
+int upload(const char * zipname){
     CURL *curl;
     CURLcode res;
     FILE *in;
@@ -46,7 +47,12 @@ void upload(const char * zipname){
       /* First set the URL that is about to receive our POST. This URL can
            just as well be a https:// URL if that is what should receive the
            data. */
+
+// <<<<<<< HEAD
+//       curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=group2&filename=data.zip");
+// =======
       curl_easy_setopt(curl, CURLOPT_URL,urls);
+
       /* Now specify the POST data */
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS,data);
 
@@ -59,8 +65,10 @@ void upload(const char * zipname){
       /* Perform the request, res will get the return code */
       res = curl_easy_perform(curl);
       /* Check for errors */
-      if(res != CURLE_OK)
+      if(res != CURLE_OK){
           fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+          return -1;
+        }
 
       /* always cleanup */
       curl_easy_cleanup(curl);
@@ -70,5 +78,6 @@ void upload(const char * zipname){
 
     }
     curl_global_cleanup();
+    return 0;
 }
 

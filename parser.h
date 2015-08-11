@@ -1,9 +1,9 @@
-// #include "listener.h"
+#include "listener.h"
 #include "saveXML.h"
 #include "delete.h"
 #include "upload.h"
 
-int GAP =  5;
+int GAP;
 struct raw_hotspot_xml_data raw;
 struct raw_sta_xml_data raw_sta;
 

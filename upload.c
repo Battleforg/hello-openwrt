@@ -48,9 +48,6 @@ int upload(const char * zipname){
            just as well be a https:// URL if that is what should receive the
            data. */
 
-// <<<<<<< HEAD
-//       curl_easy_setopt(curl, CURLOPT_URL, "http://jxuao.me/upload?user=group2&filename=data.zip");
-// =======
       curl_easy_setopt(curl, CURLOPT_URL,urls);
 
       /* Now specify the POST data */

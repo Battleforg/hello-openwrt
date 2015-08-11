@@ -19,4 +19,4 @@ delete.o : delete.c delete.h
 threads.o : threads.c parser.h
 	$(CC) $(CFLAGS) -c threads.c -o threads.o
 clean:
-	rm -rf *.o listener data/hotspot/*.xml data/station/*.xml data/*.xml
+	rm -rf *.o listener /tmp/group2/data/hotspot/*.xml /tmp/group2/data/station/*.xml /tmp/group2/data/*.xml /tmp/group2/zip/*.zip

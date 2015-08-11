@@ -8,16 +8,11 @@ void name_ini(){
     int i;
     for (i = 0; i < 20; i++) {
         char name[50] = "/tmp/group2/zip/data";
-
-        char str[2];
+        char str[3];
         sprintf(str,"%02d",i);
-
-        printf("%s\n", str);
         strcat(name,str);
-        printf("%s\n", name);
         strcat(name,".zip");
         zip_name[i] = name;
-        printf("%s\n", zip_name[i]);
     }
 }
 
@@ -41,6 +36,7 @@ void *thread2(void *arg) {
             rename("/tmp/group2/zip/data.zip",zip_name[estab_count]);
             zip_num--;
             estab_count++;
+            printf("!!!!!!!!!\n");
             if (estab_count == 20) {
                 estab_count = 0;
                 if(estab_count == upload_count) {

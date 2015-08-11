@@ -240,7 +240,6 @@ void refreshAndUpload() {
 //openwrt
 
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
-    zip_num++;
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
 

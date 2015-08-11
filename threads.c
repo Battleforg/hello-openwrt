@@ -4,20 +4,8 @@ char* zip_name[20];
 
 pthread_t thd1, thd2;
 
-void name_ini(){
-    int i;
-    for (i = 0; i < 20; i++) {
-        char name[50] = "/tmp/group2/zip/data";
-        char str[3];
-        sprintf(str,"%02d",i);
-        strcat(name,str);
-        strcat(name,".zip");
-        zip_name[i] = name;
-    }
-}
-
 void *thread1(void *arg) {
-    while(1){
+    while(1) {
         writeIndex();
         myPcapCatchAndAnaly();
     }
@@ -25,28 +13,41 @@ void *thread1(void *arg) {
 }
 
 void *thread2(void *arg) {
+    //容量 size
+    int size = 20;
+    //首先确定文件名称
+    for (int i = 0; i < size; i++) {
+        char name[50] = "/tmp/group2/zip/data";
+        char str[3];
+        sprintf(str,"%02d",i);
+        strcat(name,str);
+        strcat(name,".zip");
+        zip_name[i] = name;
+        // printf("%s\n", zip_name[i]);
+    }
+    //记录当前打包和上传的文件数量
     int estab_count = 0;
     int upload_count = 0;
-    printf("thread2!\n");
-    char tmp[50];
-    name_ini();
+    char* dataname = "/tmp/group2/zip/data.zip";
     while(1) {
-        if (zip_num > 0) {
+        printf("%d\n",access(dataname,F_OK));
+        if (!access(dataname,F_OK)) {
+            printf("%s\n",zip_name[estab_count]);
+            if (rename(dataname, zip_name[estab_count]) != 0) {
+                perror("rename");
+            }
 
-            rename("/tmp/group2/zip/data.zip",zip_name[estab_count]);
-            zip_num--;
-            estab_count++;
             printf("!!!!!!!!!\n");
+            estab_count++;
             if (estab_count == 20) {
                 estab_count = 0;
                 if(estab_count == upload_count) {
                     break;
                 }
             }
-            if(estab_count - upload_count == -1) {
-                break;
-            }
         }
+        printf("%d\n",upload(zip_name[upload_count]));
+        char tmp[50];
         if (upload(zip_name[upload_count]) == 0) {
             strcpy(tmp,"");
             strcat(tmp,"rm -rf ");
@@ -63,25 +64,26 @@ void *thread2(void *arg) {
     return NULL;
 }
 
-void thread_create(){
+void thread_create(int a){
     int temp;
-    if((temp = pthread_create(&thd1, NULL, thread1, NULL)) == 0) {
-        printf("线程1被创建\n");
+    if (a == 1) {
+        if((temp = pthread_create(&thd1, NULL, thread1, NULL)) == 0) {
+            printf("线程1被创建\n");
+        } else {
+            printf("线程1创建失败!\n");
+        }
     } else {
-        printf("线程1创建失败!\n");
-    }
-
-    if((temp = pthread_create(&thd2, NULL, thread2, NULL)) == 0) {
-        printf("线程2被创建\n");
-    } else {
-        printf("线程2创建失败\n");
+        if((temp = pthread_create(&thd2, NULL, thread2, NULL)) == 0) {
+            printf("线程2被创建\n");
+        } else {
+            printf("线程2创建失败\n");
+        }
     }
 }
 
 
 
 int main() {
-    zip_num = 0;
     GAP = 5;
     int comd;
     const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
@@ -93,21 +95,24 @@ int main() {
     folder_create("/tmp/group2/data/hotspot");
     folder_create("/tmp/group2/data/station");
     folder_create("/tmp/group2/zip");
-    remove_dir("/tmp/group2/data/hotspot");
-    remove_dir("/tmp/group2/data/station");
-    remove_dir("/tmp/group2/zip");
+    // remove_dir("/tmp/group2/data/hotspot");
+    // remove_dir("/tmp/group2/data/station");
+    // remove_dir("/tmp/group2/zip");
 
     //write the index file for zip file
 
     printf("Please input a number:\n");
-    printf("1.run!\n");
-    printf("2.set upload information\n");
+    printf("1&2.run!\n");
+    printf("3.set upload information\n");
     while(scanf("%d",&comd) == 1){
         switch(comd){
             case 1:
-                    thread_create();
+                    thread_create(1);
                     break;
             case 2:
+                    thread_create(2);
+                    break;
+            case 3:
                     seturls();
                     break;
             default:

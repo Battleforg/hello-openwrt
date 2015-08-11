@@ -242,6 +242,12 @@ void refreshAndUpload() {
     hotspot_records_count = 0;
     sta_records_count = 0;
 
+/* zip
+ * -m 将文件压缩并加入压缩文件后，删除原始文件，即把文件移到压缩文件中。
+ * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
+ * -q 不显示指令执行过程。
+**/
+
 //test
 
     // // compress and upload

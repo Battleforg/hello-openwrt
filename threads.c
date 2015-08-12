@@ -14,21 +14,8 @@ void *thread1(void *arg) {
 }
 
 void *thread2(void *arg) {
-    //容量 size
-    // int size = 20;
-    // //首先确定文件名称
-    // for (int i = 0; i < size; i++) {
-    //     char name[50] = "/tmp/group2/zip/data";
-    //     char str[3];
-    //     sprintf(str,"%02d",i);
-    //     strcat(name,str);
-    //     strcat(name,".zip");
-    //     zip_name[i] = name;
-    //     // printf("%s\n", zip_name[i]);
-    // }
-    // //记录当前打包和上传的文件数量
-    // int estab_count = 0;
-    // int upload_count = 0;
+    int counter;
+    int limit = 10;
     char* oldname = "/tmp/group2/zip/data.zip";
     char* dataname = "/tmp/group2/zip/upload.zip";
     long globalSecond = time((time_t*)NULL);
@@ -40,48 +27,25 @@ void *thread2(void *arg) {
         //printf("%d\n", d);
         if(d >= interval) {
             refreshAndZip();
-            printf("\n------------------------------\n");
             if (!access(oldname,F_OK)) {
-
                 if (rename(oldname, dataname) != 0) {
                     perror("rename");
                 } else {
+                    counter = 0;
                     globalSecond = seconds;
-                    printf("upload\n");
-                    upload(dataname);
+                    do {
+                        counter++;
+                        if (counter > limit) {
+                            pthread_exit(NULL);
+                        }
+                        printf("\n------------------------------\n");
+                        printf("upload %d time(s)\n", counter);
+                    } while (upload(dataname)!=0);
+
                 }
             } else {
                 printf("no data\n");
             }
-
-                // printf("%s\n",zip_name[estab_count]);
-                // if (rename(dataname, zip_name[estab_count]) != 0) {
-                //     perror("rename");
-                // }
-
-                // printf("!!!!!!!!!\n");
-                // estab_count++;
-                // if (estab_count == 20) {
-                //     estab_count = 0;
-                //     if(estab_count == upload_count) {
-                //         break;
-                //     }
-                // }
-                // printf("%d\n",upload(zip_name[upload_count]));
-                // char tmp[50];
-                // if (upload(zip_name[upload_count]) == 0) {
-                //     globalSecond = time((time_t*)NULL);
-                //     strcpy(tmp,"");
-                //     strcat(tmp,"rm -rf ");
-                //     strcat(tmp,zip_name[upload_count]);
-                //     system(tmp);
-                //     upload_count++;
-                //     if(upload_count == 20) {
-                //         upload_count = 0;
-                //     }
-                // } else {
-                //     continue;
-                // }
         }
     }
     return NULL;
@@ -122,9 +86,6 @@ int main() {
     folder_create("/tmp/group2/data/hotspot");
     folder_create("/tmp/group2/data/station");
     folder_create("/tmp/group2/zip");
-    // remove_dir("/tmp/group2/data/hotspot");
-    // remove_dir("/tmp/group2/data/station");
-    // remove_dir("/tmp/group2/zip");
 
     //write the index file for zip file
 
@@ -148,5 +109,9 @@ int main() {
                     break;
         }
     }
+
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
     return 0;
 }

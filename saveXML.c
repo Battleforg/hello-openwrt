@@ -1,15 +1,9 @@
 #include "saveXML.h"
-#include "upload.h"
-#include "delete.h"
 
 //write GAB_ZIP_INDEX.xml
 void writeIndex() {
     FILE* stream;
-
     char filename[] = "/tmp/group2/data/GAB_ZIP_INDEX.xml";
-    //test
-    //char filename[] = "data/GAB_ZIP_INDEX.xml";
-
     //if the index file exists
     if (fopen(filename, "r")) {
         return ;
@@ -92,14 +86,10 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
     return 1;
 }
 
-void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
-{
+void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
     FILE* stream;
 
-    // char filename[70] = "/tmp/group2/data/hotspot/145-510002-";
-    // test
-    char filename[70] = "data/hotspot/145-510002-";
-
+    char filename[80] = "/tmp/group2/data/hotspot/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -111,6 +101,7 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     strcat(filename,str);
     char* back = "-WA_SOURCE_FJ_1002-0.xml";
     strcat(filename,back);
+
     if (fopen(filename, "w")) {
         stream = fopen(filename, "w");
         fprintf(stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -139,9 +130,7 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer)
     // printf("------hotspot------------%d----------------------\n", hotspot_records_count);
     // printf(" SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
     //     hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
-
 }
-
 
 // record MAC addresses of know station
 char knownStaMAC[PACKET_NUMBER][20];
@@ -169,14 +158,9 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
     return 1;
 }
 
-void save_sta(struct raw_sta_xml_data* sta_pointer)
-{
+void save_sta(struct raw_sta_xml_data* sta_pointer) {
     FILE* stream;
-
-
-    char filename [70] = "/tmp/group2/data/station/145-510002-";
-    // test
-    // char filename [70] = "data/station/145-510002-";
+    char filename [80] = "/tmp/group2/data/station/145-510002-";
 
     long seconds = time((time_t*)NULL);
     char curtime[11];
@@ -223,13 +207,10 @@ void save_sta(struct raw_sta_xml_data* sta_pointer)
     // printf("-----------sta-------%d----------------------\n", sta_records_count);
     // printf(" MAC:%s\n rssi:%d recieved time:%s\n", sta_pointer->mac, sta_pointer->rssi,
     //     sta_pointer->recieved_time);
-
-
 }
 
-
 // refresh known data of station and hotspot
-void refreshAndUpload() {
+void refreshAndZip() {
     // clear known station and hotspot
     int i;
     for (i = 0; i < hotspot_records_count; ++i) {
@@ -242,23 +223,12 @@ void refreshAndUpload() {
     hotspot_records_count = 0;
     sta_records_count = 0;
 
-//test
-
-    // // compress and upload
-    // system("zip -r -q zip/data.zip data");
-    // upload("zip/data.zip");
-    // //delete all old file
-    // remove_dir("data/hotspot");
-    // remove_dir("data/station");
-    // remove_dir("zip");
-
-//openwrt
-
+/* zip
+ * -m 将文件压缩并加入压缩文件后，删除原始文件，即把文件移到压缩文件中。
+ * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
+ * -q 不显示指令执行过程。
+**/
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
-    zip_num++;
-    // upload("/tmp/group2/zip/data.zip");
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
-    // remove_dir("/tmp/group2/zip");
-
 }

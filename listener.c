@@ -2,13 +2,12 @@
 #include "saveXML.h"
 /****************************hotspot*************************************/
 
-
 // get SIGNAL in dBm
 void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTSPOT_XML_DATA* raw_pointer)
 {
     // skip constant header
     const u_char * currentPos = (u_char*)(packet + 4);
-    
+
     int signal_count = 0;
     int present_count = 0;
     while(currentPos[3] &IEEE80211_RADIOTAP_EXT) {
@@ -27,7 +26,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTS
     present_count++;
 
     // after the steps above, we get total amount of present
-    if ((rHeader->present[0] & IEEE80211_RADIOTAP_DBM_ANTSIGNAL) && (signal_count > 0)) { 
+    if ((rHeader->present[0] & IEEE80211_RADIOTAP_DBM_ANTSIGNAL) && (signal_count > 0)) {
         // how many bit we should shift due to TSFT, FLAGS, RATE, CHANNEL and FHSS
         int shift = 0;
         int i;
@@ -64,7 +63,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTS
                 // do not opeartion and add 1
                 s = (~s) + 1;
                 temp_signal += s;
-            
+
                 shift += 1;
             }
 
@@ -99,7 +98,7 @@ void getSignal(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_HOTS
             currentPos += shift ;
             shift = 0;
         }
-        
+
         temp_signal /= signal_count;
         temp_signal *= -1;
         // output rssi to struct RAW_HOTSPOT_XML_DATA  pointer raw_pointer
@@ -112,7 +111,7 @@ void getChannel(const RADIOTAP_C_HEADER *rHeader,const u_char * packet, RAW_HOTS
 {
     // skip constant header
     const u_char * currentPos  = (u_char*)(packet + 4);
-    
+
     int present_count = 0;
     while(currentPos[3] & IEEE80211_RADIOTAP_EXT) {
         currentPos += 4;
@@ -233,10 +232,10 @@ void print_encry(ENCRYPTION * e, RAW_HOTSPOT_XML_DATA* raw_pointer)
                 sprintf(raw_pointer->encryption_type, "03");   // wpa2
                 break;
 
-                case 1: 
+                case 1:
                 sprintf(raw_pointer->encryption_type, "02");   // wpa
                 break;
-                default: 
+                default:
                 break;
             }
         }
@@ -263,22 +262,22 @@ int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW
     len_count -= radiotap_len;
     // SOURCE MAC
     // output source mac to struct RAW_HOTSPOT_XML_DATA raw
-    sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X", bHeader->address2[0], bHeader->address2[1], 
+    sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X", bHeader->address2[0], bHeader->address2[1],
            bHeader->address2[2], bHeader->address2[3], bHeader->address2[4], bHeader->address2[5]);
-    
+
     if (!addNewHotspot(raw_pointer)) {
         return 0;
     }
     if (bHeader -> ssid_tag_length) {
-        // get SSID 
+        // get SSID
         for (i = 0; i < bHeader->ssid_tag_length; ++i) {
             sprintf(raw_pointer->ssid + i, "%c", bHeader->ssid[i]);
-        }   
+        }
     } else {
         //sprintf(raw_pointer->ssid, "Broadcast");
         return 0;
     }
-      
+
     ENCRYPTION e;
     e.wpa_version = 0;
     e.group_ciphers = 0;
@@ -287,7 +286,7 @@ int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW
 
     static unsigned char wpa_oui[3] = {0x00, 0x50, 0xf2};
     static unsigned char wpa2_oui[3] = {0x00, 0x0f, 0xac};
-    // begin scan data to find rsn and wpa type 
+    // begin scan data to find rsn and wpa type
     const u_char * p_encryption = &(bHeader->ssid[bHeader->ssid_tag_length]);
     len_count -= (38 + bHeader->ssid_tag_length);
 
@@ -343,7 +342,7 @@ int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw
     switch(cHeader->frame_control[0]) {
         // probe request
         case PROBE_REQUEST:{
-            sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1], 
+            sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1],
                 cHeader->address2[2], cHeader->address2[3], cHeader->address2[4], cHeader->address2[5]);
             //printf("address2:%s\n", raw_pointer->mac);
             return 1;
@@ -351,15 +350,12 @@ int getStationMAC(const IEEE80211_COMMON_HEADER * cHeader, RAW_STA_XML_DATA* raw
             break;
         // rts
         case RTS:{
-            sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1], 
+            sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X",  cHeader->address2[0], cHeader->address2[1],
                 cHeader->address2[2], cHeader->address2[3], cHeader->address2[4], cHeader->address2[5]);
             //printf("address2:%s\n", raw_pointer->mac);
             return 1;
             }
             break;
-
-     
-
         default: break;
     }
     return 0;
@@ -381,7 +377,7 @@ int fillStaData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW_STA
     struct raw_hotspot_xml_data temp_raw = {"", "", 0, "", "", 0};
     getSignal(rHeader, packet, &temp_raw);
     raw_pointer->rssi = temp_raw.rssi;
-    
+
     // fill recieved time
     sprintf(raw_pointer->recieved_time, "%ld", pkthdr->ts.tv_sec);
     // successful fill process

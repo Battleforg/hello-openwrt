@@ -1,19 +1,44 @@
 #include <pthread.h>
+#include <signal.h>
 #include "parser.h"
 #include "upload.h"
 char* zip_name[20];
 int interval = 10;
 pthread_t thd1, thd2;
+pthread_mutex_t mut;
+pthread_cond_t condp;
+int flag = 0;
 
-void *thread1(void *arg) {
-    while(1) {
-        writeIndex();
-        myPcapCatchAndAnaly();
+void *thread1(void *arg){
+    int j;
+    writeIndex();
+    hotspot_records_count = 0;
+    sta_records_count = 0;
+    while(1){
+        pthread_mutex_lock(&mut); 
+        if(flag == 1){
+            pthread_cond_wait(&condp,&mut);
+        }
+        pthread_mutex_unlock (&mut);
+
+        if(hotspot_records_count + sta_records_count < 1000){
+            myPcapCatchAndAnaly();
+        }else{
+            for(j = 0; j < 4; j++){
+                sleep(2);
+                if(hotspot_records_count + sta_records_count < 1000){
+                    break;
+                }
+                if(j == 3){
+                    pthread_exit (NULL);
+                }
+            }
+        }
     }
     return NULL;
 }
 
-void *thread2(void *arg) {
+void *thread2(void *arg){
     int counter;
     int limit = 10;
     char* oldname = "/tmp/group2/zip/data.zip";
@@ -26,7 +51,13 @@ void *thread2(void *arg) {
         int d = seconds - globalSecond;
         //printf("%d\n", d);
         if(d >= interval) {
+            flag = 1;
+            pthread_mutex_lock (&mut);
+            pthread_cond_signal(&condp);
             refreshAndZip();
+            flag--;
+            pthread_mutex_unlock(&mut);
+
             if (!access(oldname,F_OK)) {
                 if (rename(oldname, dataname) != 0) {
                     perror("rename");
@@ -36,6 +67,8 @@ void *thread2(void *arg) {
                     do {
                         counter++;
                         if (counter > limit) {
+                            printf("fatal upload error!\n");
+                            pthread_cancel(thd1);
                             pthread_exit(NULL);
                         }
                         printf("\n------------------------------\n");
@@ -48,12 +81,19 @@ void *thread2(void *arg) {
                 printf("no data\n");
             }
         }
+        //if thread 1 is closed
+        if(0 != pthread_kill(thd1,0)){
+            break;
+        }
     }
     return NULL;
 }
 
 void thread_create(){
     int temp;
+    
+    pthread_mutex_init(&mut,NULL);
+    pthread_cond_init(&condp,NULL);
 
     if((temp = pthread_create(&thd1, NULL, thread1, NULL)) == 0) {
         printf("线程1被创建\n");
@@ -88,6 +128,10 @@ int main() {
     folder_create("/tmp/group2/data/station");
     folder_create("/tmp/group2/zip");
 
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
+
     //write the index file for zip file
 
     printf("Please input a number:\n");
@@ -98,6 +142,11 @@ int main() {
         switch(comd){
             case 1:
                     thread_create();
+                    pthread_join(thd1,NULL);
+                    pthread_join(thd2,NULL);
+                    pthread_mutex_destroy(&mut);
+                    pthread_cond_destroy(&condp);
+                    printf("running terminated!\n" );
                     break;
             case 2:
                     scanf("%d",&interval);
@@ -111,8 +160,5 @@ int main() {
         }
     }
 
-    remove_dir("/tmp/group2/data/hotspot");
-    remove_dir("/tmp/group2/data/station");
-    remove_dir("/tmp/group2/zip");
     return 0;
 }

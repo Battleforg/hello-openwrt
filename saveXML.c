@@ -62,8 +62,6 @@ void writeIndex() {
 
 //record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
-// count the number of records
-int hotspot_records_count = 0;
 
 // add new hotspot record to knownHotspotMAC
 int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
@@ -134,8 +132,6 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
 
 // record MAC addresses of know station
 char knownStaMAC[PACKET_NUMBER][20];
-// count the number of records
-int sta_records_count = 0;
 
 // add new station record to knownStaMAC
 int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
@@ -220,8 +216,6 @@ void refreshAndZip() {
     for (i = 0; i < sta_records_count; ++i) {
         memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
     }
-    hotspot_records_count = 0;
-    sta_records_count = 0;
 
 /* zip
  * -m 将文件压缩并加入压缩文件后，删除原始文件，即把文件移到压缩文件中。
@@ -230,5 +224,7 @@ void refreshAndZip() {
 **/
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
     remove_dir("/tmp/group2/data/hotspot");
+    hotspot_records_count = 0;
     remove_dir("/tmp/group2/data/station");
+    sta_records_count = 0;
 }

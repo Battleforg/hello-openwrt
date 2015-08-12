@@ -81,7 +81,7 @@ int myPcapCatchAndAnaly() {
     int id = 0;
     //loop
     printf("Get Packets Start!\n");
-    pcap_loop(handle, -1, getPacket, (u_char*)&id);
+    pcap_loop(handle,1, getPacket, (u_char*)&id);
     pcap_close(handle);
     return 0;
 }

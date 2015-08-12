@@ -1,3 +1,6 @@
+#ifndef _UPLOAD_H_
+#define _UPLOAD_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -17,3 +20,4 @@ void seturls();
 
 int upload( const char * zipname);
 
+#endif

@@ -2,11 +2,9 @@
 #include <signal.h>
 #include "parser.h"
 #include "upload.h"
-char* zip_name[20];
+
 int interval = 10;
 pthread_t thd1, thd2;
-pthread_mutex_t mut;
-pthread_cond_t condp;
 int flag = 0;
 
 void *thread1(void *arg){
@@ -15,11 +13,9 @@ void *thread1(void *arg){
     hotspot_records_count = 0;
     sta_records_count = 0;
     while(1){
-        pthread_mutex_lock(&mut); 
         if(flag == 1){
-            pthread_cond_wait(&condp,&mut);
+            continue;
         }
-        pthread_mutex_unlock (&mut);
 
         if(hotspot_records_count + sta_records_count < 1000){
             myPcapCatchAndAnaly();
@@ -52,11 +48,8 @@ void *thread2(void *arg){
         //printf("%d\n", d);
         if(d >= interval) {
             flag = 1;
-            pthread_mutex_lock (&mut);
-            pthread_cond_signal(&condp);
             refreshAndZip();
             flag--;
-            pthread_mutex_unlock(&mut);
 
             if (!access(oldname,F_OK)) {
                 if (rename(oldname, dataname) != 0) {
@@ -91,9 +84,6 @@ void *thread2(void *arg){
 
 void thread_create(){
     int temp;
-    
-    pthread_mutex_init(&mut,NULL);
-    pthread_cond_init(&condp,NULL);
 
     if((temp = pthread_create(&thd1, NULL, thread1, NULL)) == 0) {
         printf("线程1被创建\n");
@@ -144,8 +134,6 @@ int main() {
                     thread_create();
                     pthread_join(thd1,NULL);
                     pthread_join(thd2,NULL);
-                    pthread_mutex_destroy(&mut);
-                    pthread_cond_destroy(&condp);
                     printf("running terminated!\n" );
                     break;
             case 2:

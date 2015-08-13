@@ -39,9 +39,9 @@ int myPcapCatchAndAnaly() {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         return 0;
     }
-    else {
-        printf("Opened device %s\n",dev);
-    }
+    // else {
+    //     printf("Opened device %s\n",dev);
+    // }
 
     // 由于在该路由器测试时，发现在该openwrt系统上不支持libpcap设置monitor模式，在激活的时候会产生错误
     // 将采用手动设置并检测网卡是否为monitor模式
@@ -80,7 +80,7 @@ int myPcapCatchAndAnaly() {
 
     int id = 0;
     //loop
-    printf("Get Packets Start!\n");
+    // printf("Get Packets Start!\n");
     pcap_loop(handle,1, getPacket, (u_char*)&id);
     pcap_close(handle);
     return 0;

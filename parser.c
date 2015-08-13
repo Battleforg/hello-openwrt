@@ -27,10 +27,10 @@ int myPcapCatchAndAnaly() {
     int header_type;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* openwrt && linux */
-    //char *dev=(char *)"wlan0";
+    char *dev=(char *)"wlan0";
     /* mac os */
     //test
-    char* dev=(char *)"en0";
+    // char* dev=(char *)"en0";
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
 
     if (handle == NULL)  {
@@ -51,12 +51,12 @@ int myPcapCatchAndAnaly() {
 
     // 若是mac os系统，则可以支持
     // test
-    // if(pcap_set_rfmon(handle,1)!=0) {
-    //     fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-    //     return 0;
-    // } else {
-    //     printf("Device %s has been opened in monitor mode\n", dev);
-    // }
+    if(pcap_set_rfmon(handle,1)!=0) {
+        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+        return 0;
+    } else {
+        printf("Device %s has been opened in monitor mode\n", dev);
+    }
 
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度

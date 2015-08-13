@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <math.h>
+#include <stdlib.h>
 #include "parser.h"
 #include "upload.h"
 
@@ -179,11 +180,20 @@ int main() {
             case 2:
                     scanf("%d",&interval);
                     printf("upload interval:%d\n",interval);
+                    printf("Please input a number:\n");
+                    printf("1.run!\n");
+                    printf("2.set upload interval!\n");
+                    printf("3.set upload information!\n");
                     break;
             case 3:
                     seturls();
+                    printf("Please input a number:\n");
+                    printf("1.run!\n");
+                    printf("2.set upload interval!\n");
+                    printf("3.set upload information!\n");
                     break;
             default:
+                    printf("Input valid command!\n");
                     break;
         }
         // 运行后当所有线程结束，整个进程结束

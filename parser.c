@@ -51,12 +51,12 @@ int myPcapCatchAndAnaly() {
 
     // 若是mac os系统，则可以支持
     // test
-    if(pcap_set_rfmon(handle,1)!=0) {
-        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-        return 0;
-    } else {
-        printf("Device %s has been opened in monitor mode\n", dev);
-    }
+    // if(pcap_set_rfmon(handle,1)!=0) {
+    //     fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+    //     return 0;
+    // } else {
+    //     printf("Device %s has been opened in monitor mode\n", dev);
+    // }
 
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度

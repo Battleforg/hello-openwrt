@@ -62,8 +62,6 @@ void writeIndex() {
 
 //record  MAC addresses of  known hotspot
 char knownHotspotMAC[PACKET_NUMBER][20];
-// count the number of records
-int hotspot_records_count = 0;
 
 // add new hotspot record to knownHotspotMAC
 int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
@@ -88,11 +86,11 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
 
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
     FILE* stream;
-
     char filename[80] = "/tmp/group2/data/hotspot/145-";
     strcat(filename,code);
     char* line = "-";
     strcat(filename,line);
+
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -129,15 +127,15 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
     } else {
         printf("fail to save xml!\n");
     }
-    printf("------hotspot------------%d----------------------\n", hotspot_records_count);
-    printf(" SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
-        hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
+
+    // printf("------hotspot------------%d----------------------\n", hotspot_records_count);
+    // printf(" SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
+    //     hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
+
 }
 
 // record MAC addresses of know station
 char knownStaMAC[PACKET_NUMBER][20];
-// count the number of records
-int sta_records_count = 0;
 
 // add new station record to knownStaMAC
 int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
@@ -162,10 +160,12 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
 
 void save_sta(struct raw_sta_xml_data* sta_pointer) {
     FILE* stream;
+
     char filename [80] = "/tmp/group2/data/station/145-";
     strcat(filename,code);
     char* line = "-";
     strcat(filename,line);
+
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
@@ -223,8 +223,6 @@ void refreshAndZip() {
     for (i = 0; i < sta_records_count; ++i) {
         memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
     }
-    hotspot_records_count = 0;
-    sta_records_count = 0;
 
 /* zip
  * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
@@ -232,5 +230,8 @@ void refreshAndZip() {
 **/
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
     remove_dir("/tmp/group2/data/hotspot");
+    hotspot_records_count = 0;
     remove_dir("/tmp/group2/data/station");
+    sta_records_count = 0;
+
 }

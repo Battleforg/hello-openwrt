@@ -1,3 +1,6 @@
+#ifndef _DELETE_H_
+#define _DELETE_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -8,3 +11,5 @@
 
 void dfs_remove_dir();
 void remove_dir(const char *path_raw);
+
+#endif

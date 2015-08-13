@@ -1,14 +1,22 @@
 #include <pthread.h>
+#include <signal.h>
 #include "parser.h"
 #include "upload.h"
-char* zip_name[20];
-int interval = 10;
-pthread_t thd1, thd2;
 
-void *thread1(void *arg) {
-    while(1) {
-        writeIndex();
-        myPcapCatchAndAnaly();
+int interval = 10;
+pthread_t thd1, thd2, thd3;
+void *thread1(void *arg){
+    //写入索引文件
+    writeIndex();
+    //初始化
+    hotspot_records_count = 0;
+    sta_records_count = 0;
+
+    //检测是否能成功进行抓包
+    if (myPcapCatchAndAnaly() == 0) {
+        printf("device error!!\n");
+        //产生错误，结束该线程
+        pthread_exit(NULL);
     }
     return NULL;
 }
@@ -54,11 +62,35 @@ void *thread2(void *arg) {
                 printf("no data\n");
             }
         }
+        //if thread 1 is closed, then thread 2 will also be end
+        if(pthread_kill(thd1,0) != 0){
+            break;
+        }
     }
     return NULL;
 }
 
-void thread_create(){
+
+void *thread3(void *arg){
+    int n = 0;
+    //检测当前获取的xml文件个数是否超过阈值
+    while(1) {
+        n = 0;
+        while (hotspot_records_count + sta_records_count > 25) {
+            sleep(2);
+            n++;
+            printf("%d\n",(hotspot_records_count+sta_records_count));
+            if (n > 4) {
+                printf("!!!!!!\n");
+                terminate();
+                pthread_exit(NULL);
+            }
+        }
+    }
+    return NULL;
+}
+
+int thread_create(){
     int temp;
 
     if((temp = pthread_create(&thd1, NULL, thread1, NULL)) == 0) {
@@ -72,6 +104,17 @@ void thread_create(){
     } else {
         printf("线程2创建失败\n");
     }
+
+    if((temp = pthread_create(&thd3, NULL, thread3, NULL)) == 0) {
+        printf("线程3被创建\n");
+    } else {
+        printf("线程3创建失败!\n");
+    }
+
+    if (pthread_kill(thd1,0)!=0 && pthread_kill(thd2,0)!=0 && pthread_kill(thd3,0)!=0) {
+        return 0;
+    }
+    return 1;
 
 }
 
@@ -87,6 +130,7 @@ int main() {
     const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
     strcpy(urls,origin);
     code = "510002";
+    int flag = 0;
 
     //创建文件夹
     folder_create("/tmp/group2");
@@ -94,6 +138,7 @@ int main() {
     folder_create("/tmp/group2/data/hotspot");
     folder_create("/tmp/group2/data/station");
     folder_create("/tmp/group2/zip");
+
     remove_dir("/tmp/group2/data/hotspot");
     remove_dir("/tmp/group2/data/station");
     remove_dir("/tmp/group2/zip");
@@ -107,7 +152,11 @@ int main() {
     while(scanf("%d",&comd) == 1){
         switch(comd){
             case 1:
-                    thread_create();
+                    if (!thread_create()) {
+                        printf("error\n");
+                    } else {
+                        flag = 1;
+                    }
                     break;
             case 2:
                     scanf("%d",&interval);
@@ -118,6 +167,11 @@ int main() {
                     break;
             default:
                     break;
+        }
+        while(flag) {
+            if (pthread_kill(thd1,0)!=0 && pthread_kill(thd2,0)!=0 && pthread_kill(thd3,0)!=0) {
+                return 0;
+            }
         }
     }
     return 0;

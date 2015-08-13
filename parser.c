@@ -1,4 +1,5 @@
 #include "parser.h"
+pcap_t *handle = 0;
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
     // calculate radiotap header length
@@ -23,24 +24,17 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
 int myPcapCatchAndAnaly() {
     int status=0;
     int header_type;
-    pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* openwrt && linux */
-
     //char *dev=(char *)"wlan0";
-
     /* mac os */
     //test
     char* dev=(char *)"en0";
-
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
 
     if (handle == NULL)  {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         return 0;
-    }
-    else {
-        printf("Opened device %s\n",dev);
     }
 
     // 由于在该路由器测试时，发现在该openwrt系统上不支持libpcap设置monitor模式，在激活的时候会产生错误
@@ -79,10 +73,15 @@ int myPcapCatchAndAnaly() {
     }
 
     int id = 0;
-    //loop
-    printf("Get Packets Start!\n");
     pcap_loop(handle, -1, getPacket, (u_char*)&id);
-    pcap_close(handle);
-    return 0;
+
+    return 1;
 }
 
+void terminate() {
+    if (handle != 0) {
+        pcap_breakloop(handle);
+        printf("terminate!\n");
+    }
+    pcap_close(handle);
+}

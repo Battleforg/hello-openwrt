@@ -224,10 +224,10 @@ void refreshAndZip() {
         memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
     }
 
-/* zip
- * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
- * -q 不显示指令执行过程。
-**/
+    /* zip
+     * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
+     * -q 不显示指令执行过程。
+    **/
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
     remove_dir("/tmp/group2/data/hotspot");
     hotspot_records_count = 0;

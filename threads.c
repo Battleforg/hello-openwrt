@@ -16,6 +16,7 @@ void *thread1(void *arg) {
 void *thread2(void *arg) {
     int counter;
     int limit = 10;
+    int wait_time = 2;
     char* oldname = "/tmp/group2/zip/data.zip";
     char* dataname = "/tmp/group2/zip/upload.zip";
     long globalSecond = time((time_t*)NULL);
@@ -31,16 +32,22 @@ void *thread2(void *arg) {
                 if (rename(oldname, dataname) != 0) {
                     perror("rename");
                 } else {
-                    counter = 0;
+                    counter = 1;
+                    printf("\n------------------------------\n");
+                    printf("upload!\n");
                     globalSecond = seconds;
-                    do {
+                    while (upload(dataname)!=0) {
                         counter++;
                         if (counter > limit) {
                             pthread_exit(NULL);
                         }
+                        //如果上传失败等待(wait_time)秒后重新上传
+                        sleep(wait_time);
+                        //更新上传时间
+                        globalSecond = seconds;
                         printf("\n------------------------------\n");
-                        printf("upload %d time(s)\n", counter);
-                    } while (upload(dataname)!=0);
+                        printf("upload %d times\n", counter);
+                    }
 
                 }
             } else {
@@ -79,6 +86,7 @@ int main() {
     int comd;
     const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
     strcpy(urls,origin);
+    code = "510002";
 
     //创建文件夹
     folder_create("/tmp/group2");
@@ -86,6 +94,9 @@ int main() {
     folder_create("/tmp/group2/data/hotspot");
     folder_create("/tmp/group2/data/station");
     folder_create("/tmp/group2/zip");
+    remove_dir("/tmp/group2/data/hotspot");
+    remove_dir("/tmp/group2/data/station");
+    remove_dir("/tmp/group2/zip");
 
     //write the index file for zip file
 
@@ -109,9 +120,5 @@ int main() {
                     break;
         }
     }
-
-    remove_dir("/tmp/group2/data/hotspot");
-    remove_dir("/tmp/group2/data/station");
-    remove_dir("/tmp/group2/zip");
     return 0;
 }

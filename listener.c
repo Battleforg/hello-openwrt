@@ -265,19 +265,18 @@ int fillHotspotData(const RADIOTAP_C_HEADER *rHeader, const u_char * packet, RAW
     sprintf(raw_pointer->mac, "%02X-%02X-%02X-%02X-%02X-%02X", bHeader->address2[0], bHeader->address2[1],
            bHeader->address2[2], bHeader->address2[3], bHeader->address2[4], bHeader->address2[5]);
 
-    if (!addNewHotspot(raw_pointer)) {
-        return 0;
-    }
     if (bHeader -> ssid_tag_length) {
         // get SSID
         for (i = 0; i < bHeader->ssid_tag_length; ++i) {
             sprintf(raw_pointer->ssid + i, "%c", bHeader->ssid[i]);
         }
     } else {
-        //sprintf(raw_pointer->ssid, "Broadcast");
+        sprintf(raw_pointer->ssid, "Broadcast");
         return 0;
     }
-
+    if (!addNewHotspot(raw_pointer)) {
+        return 0;
+    }
     ENCRYPTION e;
     e.wpa_version = 0;
     e.group_ciphers = 0;

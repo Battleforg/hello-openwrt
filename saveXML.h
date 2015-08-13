@@ -11,3 +11,4 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer);
 
 // refresh known data of station and hotspot
 void refreshAndZip();
+char *code;

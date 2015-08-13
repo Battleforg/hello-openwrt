@@ -1,3 +1,5 @@
+#ifndef _SAVEXML_H_
+#define _SAVEXML_H_
 #include "listener.h"
 #include "delete.h"
 
@@ -11,3 +13,12 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer);
 
 // refresh known data of station and hotspot
 void refreshAndZip();
+char *code;
+
+// count the number of records
+int hotspot_records_count;
+// count the number of records
+int sta_records_count;
+
+#endif
+

@@ -1,17 +1,21 @@
 #include <pthread.h>
 #include <signal.h>
+#include <math.h>
 #include "parser.h"
 #include "upload.h"
 
+//上传时间间隔
 int interval = 10;
+//3个线程
 pthread_t thd1, thd2, thd3;
+
+//线程1:抓包分析，保存至xml文件
 void *thread1(void *arg){
     //写入索引文件
     writeIndex();
     //初始化
     hotspot_records_count = 0;
     sta_records_count = 0;
-
     //检测是否能成功进行抓包
     if (myPcapCatchAndAnaly() == 0) {
         printf("device error!!\n");
@@ -21,9 +25,13 @@ void *thread1(void *arg){
     return NULL;
 }
 
+//线程2:打包上传管理后台
 void *thread2(void *arg) {
+    //计数器
     int counter;
+    //重传次数
     int limit = 10;
+    //等待时机（秒）
     int wait_time = 2;
     char* oldname = "/tmp/group2/zip/data.zip";
     char* dataname = "/tmp/group2/zip/upload.zip";
@@ -33,28 +41,30 @@ void *thread2(void *arg) {
     while(1) {
         seconds = time((time_t*)NULL);
         int d = seconds - globalSecond;
-        //printf("%d\n", d);
-        if(d >= interval) {
+
+        if(d >= interval && (hotspot_records_count + sta_records_count) > 0) {
+            //打包
             refreshAndZip();
             if (!access(oldname,F_OK)) {
                 if (rename(oldname, dataname) != 0) {
                     perror("rename");
                 } else {
-                    counter = 1;
+                    counter = 0;
                     printf("\n------------------------------\n");
                     printf("upload!\n");
                     globalSecond = seconds;
                     while (upload(dataname)!=0) {
                         counter++;
-                        if (counter > limit) {
+                        //重传达到上限，结束线程
+                        if (counter >= limit) {
                             pthread_exit(NULL);
                         }
                         //如果上传失败等待(wait_time)秒后重新上传
-                        sleep(wait_time);
+                        sleep(pow(wait_time, counter));
                         //更新上传时间
                         globalSecond = seconds;
                         printf("\n------------------------------\n");
-                        printf("upload %d times\n", counter);
+                        printf("upload %d times\n", counter + 1);
                     }
 
                 }
@@ -62,7 +72,7 @@ void *thread2(void *arg) {
                 printf("no data\n");
             }
         }
-        //if thread 1 is closed, then thread 2 will also be end
+        //if thread 1 is closed, then thread 2 will also end
         if(pthread_kill(thd1,0) != 0){
             break;
         }
@@ -72,19 +82,29 @@ void *thread2(void *arg) {
 
 
 void *thread3(void *arg){
+    //计数器n
     int n = 0;
+    //等待次数
+    int times = 5;
+    //等待时机
+    int wait_time = 2;
+    //阈值
+    int threshold = 100;
     //检测当前获取的xml文件个数是否超过阈值
     while(1) {
         n = 0;
-        while (hotspot_records_count + sta_records_count > 25) {
-            sleep(2);
+        while (hotspot_records_count + sta_records_count > threshold) {
             n++;
-            printf("%d\n",(hotspot_records_count+sta_records_count));
-            if (n > 4) {
-                printf("!!!!!!\n");
+            if (n > times) {
+                //结束抓包，从而线程1结束
                 terminate();
                 pthread_exit(NULL);
             }
+            sleep(pow(wait_time,n));
+        }
+        //if thread 1 is closed, then thread 2 will also end
+        if(pthread_kill(thd1,0) != 0){
+            break;
         }
     }
     return NULL;
@@ -111,7 +131,7 @@ int thread_create(){
         printf("线程3创建失败!\n");
     }
 
-    if (pthread_kill(thd1,0)!=0 && pthread_kill(thd2,0)!=0 && pthread_kill(thd3,0)!=0) {
+    if (pthread_kill(thd1,0)!=0 || pthread_kill(thd2,0)!=0 || pthread_kill(thd3,0)!=0) {
         return 0;
     }
     return 1;
@@ -143,8 +163,6 @@ int main() {
     remove_dir("/tmp/group2/data/station");
     remove_dir("/tmp/group2/zip");
 
-    //write the index file for zip file
-
     printf("Please input a number:\n");
     printf("1.run!\n");
     printf("2.set upload interval!\n");
@@ -168,6 +186,7 @@ int main() {
             default:
                     break;
         }
+        // 运行后当所有线程结束，整个进程结束
         while(flag) {
             if (pthread_kill(thd1,0)!=0 && pthread_kill(thd2,0)!=0 && pthread_kill(thd3,0)!=0) {
                 return 0;

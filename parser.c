@@ -1,5 +1,6 @@
 #include "parser.h"
 pcap_t *handle = 0;
+
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
     // calculate radiotap header length
@@ -50,12 +51,12 @@ int myPcapCatchAndAnaly() {
 
     // 若是mac os系统，则可以支持
     // test
-    if(pcap_set_rfmon(handle,1)!=0) {
-        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-        return 0;
-    } else {
-        printf("Device %s has been opened in monitor mode\n", dev);
-    }
+    // if(pcap_set_rfmon(handle,1)!=0) {
+    //     fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+    //     return 0;
+    // } else {
+    //     printf("Device %s has been opened in monitor mode\n", dev);
+    // }
 
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度
@@ -68,7 +69,7 @@ int myPcapCatchAndAnaly() {
 
     header_type=pcap_datalink(handle);  //返回链路层的类型
     if(header_type!=DLT_IEEE802_11_RADIO) {
-        printf("Error: incorrect header type - %d",header_type);
+        printf("Error: incorrect header type - %d\n",header_type);
         return 0;
     }
 

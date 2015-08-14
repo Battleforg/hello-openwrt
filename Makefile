@@ -5,7 +5,7 @@ INCLUDE = -I/usr/local/include
 LDFLAGS = -L/usr/local/lib
 
 listener : $(OBJS)
-	$(CC) $(OBJS) -o listener $(INCLUDE) $(CFLAGS) $(LDFLAGS) -lpcap -lcurl -lpthread
+	$(CC) $(OBJS) -o listener $(INCLUDE) $(CFLAGS) $(LDFLAGS) -lpcap -lcurl -lpthread -lm
 listener.o : listener.c listener.h
 	$(CC) $(CFLAGS) -c listener.c -o listener.o
 parser.o : parser.c parser.h
@@ -19,4 +19,4 @@ delete.o : delete.c delete.h
 threads.o : threads.c parser.h
 	$(CC) $(CFLAGS) -c threads.c -o threads.o
 clean:
-	rm -rf *.o listener /tmp/group2/data/hotspot/*.xml /tmp/group2/data/station/*.xml /tmp/group2/data/*.xml
+	rm -rf *.o listener /tmp/group2/data/hotspot/*.xml /tmp/group2/data/station/*.xml /tmp/group2/data/*.xml /tmp/group2/zip/*.zip

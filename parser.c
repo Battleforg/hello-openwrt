@@ -1,4 +1,6 @@
 #include "parser.h"
+pcap_t *handle = 0; // global pcap header
+
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
     // calculate radiotap header length
@@ -10,38 +12,41 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     // if this frame is a 802.11 beacon frame
     if ((bHeader->frame_control[0]) == BEACON_FRAME && bHeader->frame_control[1] == 0x00) {
         if(fillHotspotData(rHeader, packet, &raw, pkthdr)){
-            save_hotspot(&raw);
+            while (1) {
+                if  (!flag) {
+                    save_hotspot(&raw);
+                    break;
+                }               
+            }
         }
     // if it some frame like RTS transmitted by station
     // fillStaData(rHeader, packet, &raw_sta, pkthdr);
     // if station is a new record
-    } else if (fillStaData(rHeader, packet, &raw_sta, pkthdr)) {
-        save_sta(&raw_sta);
+    } else if  (fillStaData(rHeader, packet, &raw_sta, pkthdr)) {      
+         while (1) {
+                if  (!flag) {
+                    save_sta(&raw_sta);
+                    break;
+                }               
+            }
     }
 }
 
 int myPcapCatchAndAnaly() {
     int status=0;
     int header_type;
-    pcap_t *handle=0;
     char errbuf[PCAP_ERRBUF_SIZE];
     /* openwrt && linux */
-
     char *dev=(char *)"wlan0";
-
     /* mac os */
     //test
     // char* dev=(char *)"en0";
-
     handle=pcap_create(dev,errbuf); //为抓取器打开一个句柄
 
     if (handle == NULL)  {
         fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
         return 0;
     }
-    // else {
-    //     printf("Opened device %s\n",dev);
-    // }
 
     // 由于在该路由器测试时，发现在该openwrt系统上不支持libpcap设置monitor模式，在激活的时候会产生错误
     // 将采用手动设置并检测网卡是否为monitor模式
@@ -74,15 +79,20 @@ int myPcapCatchAndAnaly() {
 
     header_type=pcap_datalink(handle);  //返回链路层的类型
     if(header_type!=DLT_IEEE802_11_RADIO) {
-        printf("Error: incorrect header type - %d",header_type);
+        printf("Error: incorrect header type - %d\n",header_type);
         return 0;
     }
 
     int id = 0;
-    //loop
-    // printf("Get Packets Start!\n");
-    pcap_loop(handle,1, getPacket, (u_char*)&id);
-    pcap_close(handle);
-    return 0;
+    pcap_loop(handle, -1, getPacket, (u_char*)&id);
+
+    return 1;
 }
 
+void terminate() {
+    if (handle != 0) {
+        pcap_breakloop(handle);
+        printf("terminate!\n");
+    }
+    pcap_close(handle);
+}

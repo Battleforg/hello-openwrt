@@ -86,13 +86,15 @@ int addNewHotspot(RAW_HOTSPOT_XML_DATA* raw_pointer) {
 
 void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
     FILE* stream;
+    char filename[80] = "/tmp/group2/data/hotspot/145-";
+    strcat(filename,code);
+    char* line = "-";
+    strcat(filename,line);
 
-    char filename[80] = "/tmp/group2/data/hotspot/145-510002-";
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
     strcat(filename,curtime);
-    char* line = "-";
     strcat(filename,line);
     char str[6];
     sprintf(str,"%05d",hotspot_records_count);
@@ -125,9 +127,11 @@ void save_hotspot(struct raw_hotspot_xml_data* hotspot_pointer) {
     } else {
         printf("fail to save xml!\n");
     }
+
     // printf("------hotspot------------%d----------------------\n", hotspot_records_count);
     // printf(" SSID:%s MAC:%s\n rssi:%d Channel:%d\n recieved time:%s\n encryption type:%s\n", hotspot_pointer->ssid, hotspot_pointer->mac, hotspot_pointer->rssi,
     //     hotspot_pointer->channel, hotspot_pointer->recieved_time, hotspot_pointer->encryption_type);
+
 }
 
 // record MAC addresses of know station
@@ -156,13 +160,16 @@ int addNewStation(RAW_STA_XML_DATA* raw_pointer) {
 
 void save_sta(struct raw_sta_xml_data* sta_pointer) {
     FILE* stream;
-    char filename [80] = "/tmp/group2/data/station/145-510002-";
+
+    char filename [80] = "/tmp/group2/data/station/145-";
+    strcat(filename,code);
+    char* line = "-";
+    strcat(filename,line);
 
     long seconds = time((time_t*)NULL);
     char curtime[11];
     sprintf(curtime,"%010ld",seconds);
     strcat(filename,curtime);
-    char* line = "-";
     strcat(filename,line);
     char str[6];
     sprintf(str,"%05d",sta_records_count);
@@ -217,14 +224,14 @@ void refreshAndZip() {
         memset(knownStaMAC[i], 0, sizeof(knownStaMAC[i]));
     }
 
-/* zip
- * -m 将文件压缩并加入压缩文件后，删除原始文件，即把文件移到压缩文件中。
- * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
- * -q 不显示指令执行过程。
-**/
+    /* zip
+     * -r 递归处理，将指定目录下的所有文件和子目录一并处理。
+     * -q 不显示指令执行过程。
+    **/
     system("zip -r -q /tmp/group2/zip/data.zip /tmp/group2/data");
     remove_dir("/tmp/group2/data/hotspot");
     hotspot_records_count = 0;
     remove_dir("/tmp/group2/data/station");
     sta_records_count = 0;
+
 }

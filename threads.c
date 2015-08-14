@@ -31,7 +31,7 @@ void *thread2(void *arg) {
     //计数器
     int counter;
     //重传次数
-    int limit = 10;
+    int limit = 5;
     //等待时机（秒）
     int wait_time = 2;
     char* oldname = "/tmp/group2/zip/data.zip";
@@ -60,6 +60,7 @@ void *thread2(void *arg) {
                         counter++;
                         //重传达到上限，结束线程
                         if (counter >= limit) {
+                            terminate();
                             pthread_exit(NULL);
                         }
                         //如果上传失败等待(wait_time)秒后重新上传
@@ -153,8 +154,8 @@ int main() {
     const char *origin = "http://jxuao.me/upload?user=group2&filename=data.zip";
     strcpy(urls,origin);
     code = "510002";
-    int flag = 0;
-
+    int tag = 0;
+    flag = 0;
     //创建文件夹
     folder_create("/tmp/group2");
     folder_create("/tmp/group2/data");
@@ -176,7 +177,7 @@ int main() {
                     if (!thread_create()) {
                         printf("error\n");
                     } else {
-                        flag = 1;
+                        tag = 1;
                     }
                     break;
             case 2:
@@ -199,7 +200,8 @@ int main() {
                     break;
         }
         // 运行后当所有线程结束，整个进程结束
-        while(flag) {
+
+        while(tag) {
             if (pthread_kill(thd1,0)!=0 && pthread_kill(thd2,0)!=0 && pthread_kill(thd3,0)!=0) {
                 return 0;
             }

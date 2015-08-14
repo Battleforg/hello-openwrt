@@ -1,5 +1,5 @@
 #include "parser.h"
-pcap_t *handle = 0;
+pcap_t *handle = 0; // global pcap header
 
 void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * packet) {
     RADIOTAP_C_HEADER * rHeader = (RADIOTAP_C_HEADER*)packet;
@@ -12,13 +12,23 @@ void getPacket(u_char * arg, const struct pcap_pkthdr * pkthdr, const u_char * p
     // if this frame is a 802.11 beacon frame
     if ((bHeader->frame_control[0]) == BEACON_FRAME && bHeader->frame_control[1] == 0x00) {
         if(fillHotspotData(rHeader, packet, &raw, pkthdr)){
-            save_hotspot(&raw);
+            while (1) {
+                if  (!flag) {
+                    save_hotspot(&raw);
+                    break;
+                }               
+            }
         }
     // if it some frame like RTS transmitted by station
     // fillStaData(rHeader, packet, &raw_sta, pkthdr);
     // if station is a new record
-    } else if (fillStaData(rHeader, packet, &raw_sta, pkthdr)) {
-        save_sta(&raw_sta);
+    } else if  (fillStaData(rHeader, packet, &raw_sta, pkthdr)) {      
+         while (1) {
+                if  (!flag) {
+                    save_sta(&raw_sta);
+                    break;
+                }               
+            }
     }
 }
 
@@ -51,12 +61,12 @@ int myPcapCatchAndAnaly() {
 
     // 若是mac os系统，则可以支持
     // test
-    // if(pcap_set_rfmon(handle,1)!=0) {
-    //     fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
-    //     return 0;
-    // } else {
-    //     printf("Device %s has been opened in monitor mode\n", dev);
-    // }
+    if(pcap_set_rfmon(handle,1)!=0) {
+        fprintf(stderr, "Device %s couldn't be opened in monitor mode\n", dev);
+        return 0;
+    } else {
+        printf("Device %s has been opened in monitor mode\n", dev);
+    }
 
     pcap_set_promisc(handle,0);   //不设置混杂模式
     pcap_set_snaplen(handle,65535);   //设置最大捕获包的长度

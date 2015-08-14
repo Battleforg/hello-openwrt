@@ -29,7 +29,8 @@ int upload(const char * zipname){
     struct stat file_info;
     char *data;
     stat(zipname, &file_info);
-    off_t uploadsize = file_info.st_size;
+    curl_off_t uploadsize =  file_info.st_size;
+    long filesize = (long) file_info.st_size;
 
     in = fopen(zipname, "rb");
     data = (char*)malloc(sizeof(char)*(uploadsize));
@@ -57,7 +58,7 @@ int upload(const char * zipname){
       // curl_easy_setopt(curl, CURLOPT_READDATA, in);
 
       /* Set the size of the file to upload */
-      curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, uploadsize);
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, filesize);
 
       /* Perform the request, res will get the return code */
       res = curl_easy_perform(curl);

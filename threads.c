@@ -45,7 +45,9 @@ void *thread2(void *arg) {
 
         if(d >= interval && (hotspot_records_count + sta_records_count) > 0) {
             //打包
+            flag = 1;
             refreshAndZip();
+            flag = 0;
             if (!access(oldname,F_OK)) {
                 if (rename(oldname, dataname) != 0) {
                     perror("rename");

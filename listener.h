@@ -140,6 +140,14 @@ struct radiotap_c_header
 
 };
 
+struct ieee80211_common_header
+{
+    u_char frame_control[2];
+    u_char duration[2];
+    u_char address1[6]; 
+    u_char address2[6]; 
+};
+
 struct ieee80211beacon_frame
 {
     u_char frame_control[2];
@@ -179,13 +187,7 @@ struct raw_hotspot_xml_data
     int rssi;                                    // rssi is a negative int variable ranging form 0 to -infinity 
 };
 
-struct ieee80211_common_header
-{
-    u_char frame_control[2];
-    u_char duration[2];
-    u_char address1[6]; 
-    u_char address2[6]; 
-};
+
 
 struct raw_sta_xml_data {
 	// should have more varibles
